@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "init.h": "c",
+        "kallsyms.h": "c",
+        "unistd.h": "c",
+        "unistd_x32.h": "c",
+        "slab.h": "c",
+        "uaccess.h": "c",
+        "posix_opt.h": "c",
+        "types.h": "c"
+    }
+}
