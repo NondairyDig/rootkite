@@ -37,10 +37,6 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
       - ./controller "hide \<file prefix to hide>"
       - ./controller "hidep \<pid to hide>"
 
-## Disclaimer
-
-This rootkit is provided for educational and research purposes only. It is not intended for malicious use. The authors are not responsible for any damage or misuse caused by this software. Use it responsibly and legally, with proper authorization.
-
 ## License
 
 This project is licensed under the GNU General Public License (GPL). See the [LICENSE](LICENSE) file for details.
@@ -54,6 +50,10 @@ The authors acknowledge the Linux kernel development community for their work on
 This rootkit can cause harm to computer systems if used without proper authorization. It is intended for educational purposes only, and any malicious use is strictly prohibited. The authors are not responsible for any misuse or damage caused by this software.
 
 Use it responsibly and ethically, with respect for others' systems and privacy.
+
+## Disclaimer
+
+This rootkit is provided for educational and research purposes only. It is not intended for malicious use. The authors are not responsible for any damage or misuse caused by this software. Use it responsibly and legally, with proper authorization.
 
 ## Support and Contact
 

