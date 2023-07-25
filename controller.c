@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <paths.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
