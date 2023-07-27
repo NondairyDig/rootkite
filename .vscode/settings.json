@@ -9,6 +9,7 @@
         "posix_opt.h": "c",
         "types.h": "c",
         "reboot.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "paravirt.h": "c"
     }
 }

