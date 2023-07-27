@@ -15,6 +15,7 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 ## Features
 
 - Hides specified files and processes based on user input.
+- Hides itself
 - Grants root access to any process.
 - Blocks system rebooting.
 
