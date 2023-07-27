@@ -4,8 +4,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+
 #define CDEV_DEVICE "controller"
 static char buf[512+1];
+
 
 int main(int argc, char *argv[])
 {
