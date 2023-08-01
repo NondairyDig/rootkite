@@ -10,6 +10,9 @@
         "types.h": "c",
         "reboot.h": "c",
         "fs.h": "c",
-        "paravirt.h": "c"
+        "paravirt.h": "c",
+        "sched.h": "c",
+        "module.h": "c",
+        "kernel.h": "c"
     }
 }

