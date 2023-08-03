@@ -42,25 +42,25 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 1. rootkite.c:
 This is the main file of the Rootkite kernel module. It includes various headers required for kernel module development. The module initializes, installs hooks, and registers a misc device called "controller" to communicate with user-space and control the rootkit's functionality. The Activation of the functionallities is done by hooking the "kill" system call and calling specific signals with pid s(as specfiied above).
 
-2. kite_init.h:
+2. **kite_init.h:** <br />
 This header file is used to determine whether the system is 64-bit and the kernel version. It defines PTREGS_SYSCALL_STUB when the system is 64-bit and the kernel uses ptregs_t type for system calls.
 
-3. kite_hook.h:
+3. **kite_hook.h:** <br />
 This header file is responsible for hooking the original kernel functions using ftrace. It provides functions to install and remove hooks, resolve hook addresses, and ftrace thunks for hooking the functions. The hooks are kept in an array in the main file, and declared there. Because of unavaillability of kallsysm_lookup_name functtion, it is probed using kprobe, and then used to get a symbol's(syscall or other function) address.
 
-4. getdents_hacks.h:
+4. **getdents_hacks.h:** <br />
 This header file contains the functions required for hiding files and directories. It contains the function to hook to the getdents and getdents64 system calls, which are used to list directory entries. The functions in this file manipulate the directory entries to hide files and processes whose names match specific criteria.
 
-5. device_handler.h:
+5. **device_handler.h:** <br />
 This header file defines the read and write functions for the "controller" misc device. The "controller" device is used to communicate with the rootkit from user-space and control its behavior. The write function is used to send commands to hide files, processes, etc., and the read function retrieves the last command written to the device.
 
-6. root_setter.h:
+6. **root_setter.h:** <br />
 This header file contains a function (set_root) responsible for escalating the calling process's privileges to root (superuser). It uses prepare_creds to copy the current credentials of the calling process and commit_creds functions to set the user and group IDs(real, effective, file system) to 0, effectively elevating the process to root.
 
-7. mod_hide.h
+7. **mod_hide.h:**** <br />
 This header file is contains the functions to hide/show the lkm, using the linux modules linked list, removing it from there and return it to the same place by request.
 
-8. controller.c:
+8. **controller.c**: <br />
 This is a user-space program that interacts with the "controller" device created by the rootkit. It is used to send commands to the rootkit to hide files and processes. It takes a single argument (hide <filename prefix> or hidep <process name>) to specify the action it wants to take.
 Overall, the Rootkite kernel module is designed to be a rootkit, providing hidden functionality and capabilities to elevate privileges and manipulate system processes and files. 
 
