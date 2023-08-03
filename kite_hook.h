@@ -66,13 +66,13 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook)
     .symbol_name = "kallsyms_lookup_name" // ready the kbrobe to probe the kallsyms_lookup_name function
     };
 
-    typedef unsigned long (*t_kallsyms_lookup_name)(const char *); // the kallsyms_lookup_name function prototype
-    unsigned long *address; // define syscall table pointer to return later
+    typedef unsigned long (*kallsyms_lookup_name_t)(const char *); // the kallsyms_lookup_name function prototype
     #if LINUX_VERSION_CODE > KERNEL_VERSION(5, 8, 0)
-        register_kprobe(&kp);
-        t_kallsyms_lookup_name kallsyms_lookup_name_new;
-        kallsyms_lookup_name_new = (t_kallsyms_lookup_name)kp.addr; // get address of function
-        hook->address = (unsigned long*)kallsyms_lookup_name_new(hook->name); // get starting point of syscall table in memory
+        kallsyms_lookup_name_t kallsyms_lookup_name_new;
+
+		register_kprobe(&kp);
+        kallsyms_lookup_name_new = (kallsyms_lookup_name_t)kp.addr; // get address of function
+        hook->address = (unsigned long)kallsyms_lookup_name_new(hook->name); // get starting point of syscall table in memory
         unregister_kprobe(&kp);
     #elif LINUX_VERSION_CODE > KERNEL_VERSION(4, 4, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0)
         hook->address = (unsigned long*)kallsyms_lookup_name(hook->name); // find syscall table symlink and get table address
@@ -156,10 +156,10 @@ int fh_install_hook(struct ftrace_hook *hook)
  * */
 void fh_remove_hook(struct ftrace_hook *hook)
 {
+	int err;
 	if(hook->address != *((unsigned long *)hook->original) || hook->address == 0 || hook->original == 0){
 		return;
 	}
-	int err;
 	err = unregister_ftrace_function(&hook->ops);
 	if(err)
 	{
