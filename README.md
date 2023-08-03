@@ -39,7 +39,7 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
       - ./controller "hidep \<pid to hide>"
 ## Files
 
-1. rootkite.c:
+1. **rootkite.c:**  <br />
 This is the main file of the Rootkite kernel module. It includes various headers required for kernel module development. The module initializes, installs hooks, and registers a misc device called "controller" to communicate with user-space and control the rootkit's functionality. The Activation of the functionallities is done by hooking the "kill" system call and calling specific signals with pid s(as specfiied above).
 
 2. **kite_init.h:** <br />
