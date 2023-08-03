@@ -57,7 +57,7 @@ This header file defines the read and write functions for the "controller" misc 
 6. **root_setter.h:** <br />
 This header file contains a function (set_root) responsible for escalating the calling process's privileges to root (superuser). It uses prepare_creds to copy the current credentials of the calling process and commit_creds functions to set the user and group IDs(real, effective, file system) to 0, effectively elevating the process to root.
 
-7. **mod_hide.h:**** <br />
+7. **mod_hide.h:** <br />
 This header file is contains the functions to hide/show the lkm, using the linux modules linked list, removing it from there and return it to the same place by request.
 
 8. **controller.c**: <br />
