@@ -156,7 +156,7 @@ int fh_install_hook(struct ftrace_hook *hook)
  * */
 void fh_remove_hook(struct ftrace_hook *hook)
 {
-	if(hook->address != *((unsigned long *)hook->original)){
+	if(hook->address != *((unsigned long *)hook->original) || hook->address == 0 || hook->original == 0){
 		return;
 	}
 	int err;
