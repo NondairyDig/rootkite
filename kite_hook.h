@@ -1,7 +1,7 @@
 #ifndef KITE_HOOK
     #define KITE_HOOK
 #include "kite_init.h"
-#include <linux/types.h>
+#include <linux/sched.h>
 #include <linux/kprobes.h> // to probe kernel symbols
 #include <linux/ftrace.h>
 #include <linux/linkage.h>
@@ -203,4 +203,5 @@ void fh_remove_hooks(struct ftrace_hook *hooks, size_t count)
 	for (i = 0 ; i < count ; i++)
 		fh_remove_hook(&hooks[i]);
 }
+
 #endif
