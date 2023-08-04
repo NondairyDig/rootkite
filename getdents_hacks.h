@@ -1,6 +1,7 @@
 #ifndef GET_DENTS_KITE
     #define GET_DENTS_KITE
     #include "kite_init.h"
+
     #include <linux/dirent.h>
     #include <linux/uaccess.h> // copy to/from user space
 

