@@ -5,6 +5,7 @@
 #include <linux/unistd.h> // syscalls macros (checks for 32 bit and defines accordinly)
 #include <asm/paravirt.h>
 #include <linux/reboot.h> // reboot function
+
 #include "kite_hook.h"
 #include "device_handler.h"
 #include "mod_hider.h"
@@ -13,7 +14,7 @@
 
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Pokkit");
+MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
 MODULE_VERSION("0.5");
 

