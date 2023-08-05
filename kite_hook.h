@@ -54,6 +54,7 @@ struct ftrace_hook {
 
 	unsigned long address;
 	struct ftrace_ops ops;
+	int activated;
 };
 
 /* Ftrace needs to know the address of the original function that we
@@ -200,35 +201,48 @@ void fh_remove_hook(struct ftrace_hook *hook)
 	}
 }
 
-/* To hook a specifiec function we iterate over the hooks array
- * and then call the fh_install_hook on the function
+/* To hook/unhook a specifiec function we iterate over the hooks array
+ * and then call the fh_install_hook/fh_remove_hook on the function
  */
-int activate_hook(struct ftrace_hook *hooks, size_t count, char *symbol)
-{
+
+int switch_hook(struct ftrace_hook *hooks, size_t count, char *symbol){
 	int err;
 	size_t i;
 
-	for (i = 0 ; i < count ; i++)
+	for (i = 0; i < count; i++)
 	{
 		if(strcmp(hooks[i].name, symbol) == 0){
-			err = fh_install_hook(&hooks[i]);
-			if(err)
-				goto error;
+			if(hooks[i].activated == 1){
+				fh_remove_hook(&hooks[i]);
+				hooks[i].activated = 0;
+			}
+
+			else{
+				err = fh_install_hook(&hooks[i]);
+				if(err){
+					goto error;
+				}
+				hooks[i].activated = 1;
+			}
 			return 0;
 		}
 	}
-	return 0;
+	return 1;
 
 error:
 	fh_remove_hook(&hooks[i]);
 	return err;
-}
 
+}
+ 
 void fh_remove_hooks(struct ftrace_hook *hooks, size_t count)
 {
 	size_t i;
 	for (i = 0 ; i < count ; i++)
-		fh_remove_hook(&hooks[i]);
+		if(hooks[i].activated == 1){
+			fh_remove_hook(&hooks[i]);
+			hooks[i].activated = 0;
+		}
 }
 
 #endif

