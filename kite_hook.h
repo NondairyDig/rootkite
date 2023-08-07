@@ -63,14 +63,14 @@ struct ftrace_hook {
  * */
 static int fh_resolve_hook_address(struct ftrace_hook *hook)
 {
-    static struct kprobe kp = {
+    static struct kprobe kp = {con
     .symbol_name = "kallsyms_lookup_name" // ready the kbrobe to probe the kallsyms_lookup_name function
     };
 
     typedef unsigned long (*kallsyms_lookup_name_t)(const char *); // the kallsyms_lookup_name function prototype
     #if LINUX_VERSION_CODE > KERNEL_VERSION(5, 8, 0)
         kallsyms_lookup_name_t kallsyms_lookup_name_new;
-
+		// can also get its addres using user-space program to locate it in /proc/kallsyms and pass it with module_param(kallsyms_lookup_name_new, ulong, S_IRUGO)
 		register_kprobe(&kp);
         kallsyms_lookup_name_new = (kallsyms_lookup_name_t)kp.addr; // get address of function
         hook->address = (unsigned long)kallsyms_lookup_name_new(hook->name); // get starting point of syscall table in memory
