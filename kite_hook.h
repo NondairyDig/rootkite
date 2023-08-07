@@ -63,7 +63,7 @@ struct ftrace_hook {
  * */
 static int fh_resolve_hook_address(struct ftrace_hook *hook)
 {
-    static struct kprobe kp = {con
+    static struct kprobe kp = {
     .symbol_name = "kallsyms_lookup_name" // ready the kbrobe to probe the kallsyms_lookup_name function
     };
 
