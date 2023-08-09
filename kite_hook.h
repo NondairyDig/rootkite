@@ -7,7 +7,15 @@
 #include <linux/linkage.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
-
+/*
+Note: hooking is achievable also with kprobe, for now ftrace is the choice for being common 
+If your kernel is built with CONFIG_OPTPROBES=y (currently this flag is automatically set 'y' on x86/x86-64,
+non-preemptive kernel) and the "debug.kprobes_optimization" kernel parameter is set to 1 (see sysctl(8)),
+Kprobes tries to reduce probe-hit overhead by using a jump instruction instead of a breakpoint instruction at each probepoint.
+When a probe is registered, before attempting this optimization, Kprobes inserts an ordinary, breakpoint-based kprobe at the specified address.
+So, even if it's not possible to optimize this particular probepoint, there'll be a probe there
+Hooking is also achievable with changing the cr0 register to disable memory protection make the memory writable
+*/
 
 const int ACTIVE_HOOKS_SIZE = 4; /*Available number of hooks to store*/
 
