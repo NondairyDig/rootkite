@@ -3,6 +3,7 @@
 
     #include <linux/kernel.h>
 
+
 typedef struct linked_list {
     char *data;
     struct linked_list *next;
@@ -10,6 +11,8 @@ typedef struct linked_list {
 
 list *files_to_hide = NULL;
 list *pids_to_hide = NULL;
+list *ports_to_hide = NULL;
+
 
 static int insert_node(list** root, char *data) {
     list* curr = *root;
@@ -33,6 +36,7 @@ static int insert_node(list** root, char *data) {
     curr->next = new_node;
     return 0;
 }
+
 
 static int remove_node_by_name(list **root, char *data){
     list* curr = *root;
@@ -78,7 +82,6 @@ static int find_node(list** root, char *data) {
 }
 
 
-
 static int cleanup_list(list** root){
     list* curr = *root;
     if (*root == NULL) {
@@ -94,9 +97,11 @@ static int cleanup_list(list** root){
     return 0;
 }
 
+
 static int cleanup_lists(void){
     cleanup_list(&files_to_hide);
     cleanup_list(&pids_to_hide);
+    cleanup_list(&ports_to_hide);
     return 0;
 }
 
