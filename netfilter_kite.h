@@ -24,7 +24,6 @@ static unsigned int hack_packet(void *priv, struct sk_buff *skb, const struct nf
 	struct iphdr *iph;
 	struct udphdr *udph;
 	struct tcphdr *tcph;
-	struct icmphdr *icmph;
 	char port[6];
 
 	if (!skb)

