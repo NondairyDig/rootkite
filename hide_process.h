@@ -4,7 +4,6 @@
     #include <linux/namei.h>
     #include <linux/path.h>
     #include "linked_list.h"
-    #include "kite_memory.h"
 
 
 

