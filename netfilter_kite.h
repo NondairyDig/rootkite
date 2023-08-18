@@ -18,8 +18,10 @@ static int packet_blocker = 0; // signal if to activate the netfilter
 static struct nf_hook_ops *nfho;
 
 
-// sk_buff is the main networking structure representing a packet.
-// block traffic, acts as a firewall to block traffic to a specific port
+/* sk_buff is the main networking structure representing a packet.
+   block traffic, acts as a firewall to block traffic to a specific port
+   uses 
+*/
 static unsigned int hack_packet(void *priv, struct sk_buff *skb, const struct nf_hook_state *state){
 	struct iphdr *iph;
 	struct udphdr *udph;
@@ -85,7 +87,9 @@ So BPF is a kernel feature. The filter should be triggered immediately when a pa
 As the original BPF paper said To minimize memory traffic, the major bottleneck in most modern system,
 the packet should be filtered ‘in place’ (e.g., where the network interface DMA engine put it)
 rather than copied to some other kernel buffer before filtering.
-libpcap opens a socket which uses packet_create function that hooks packet_rcv to handle packet sockets.(if old architecture(SOCK_PACKET),
+libpcap opens a socket which uses packet_create function that hooks packet_rcv to handle packet sockets.(skb)
+(AF_PACKET, which allows getting raw packets on the the ethernet level)(if old architecture(SOCK_PACKET),
+the packet then is passed to the hooked function.
 uses packet_rcv_spkt, if the recieve packet is not empty, uses tpacket_rcv)*/
 //! CAN ADD SOURCE/DEST ADDRESS FILTER
 static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev){
@@ -96,7 +100,7 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 	char source_port[6];
 
 
-	iph = ip_hdr(skb);
+	iph = ip_hdr(skb); // wrap and struct the packet socket buffer
 	if (iph->protocol == IPPROTO_UDP) {
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
