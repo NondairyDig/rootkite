@@ -61,7 +61,7 @@ static unsigned int hack_packet(void *priv, struct sk_buff *skb, const struct nf
 	return NF_ACCEPT;
 }
 
-/*hook switch*/
+/*netfilter hook switch, can use another function to split ping block functionality*/
 static int switch_net_hook(void){
     if(packet_blocker == 1){
 		nf_unregister_net_hook(&init_net, nfho);
