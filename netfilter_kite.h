@@ -26,6 +26,7 @@ static unsigned int hack_packet(void *priv, struct sk_buff *skb, const struct nf
 	struct iphdr *iph;
 	struct udphdr *udph;
 	struct tcphdr *tcph;
+	long payload_length;
 	char port[6];
 
 	if (!skb)
@@ -35,14 +36,14 @@ static unsigned int hack_packet(void *priv, struct sk_buff *skb, const struct nf
 		return NF_DROP;
 	}
 
-	/* can filter udp scans that sends an empty packet by checking if the payload is empty,
-	   skb->data_len <= 0 or filter the udp header ntohs(udph->len) - sizeof(udph) <= 0)
-	*/
 	if (iph->protocol == IPPROTO_UDP) { 
 		udph = udp_hdr(skb);
 		snprintf(port, 6, "%hu", ntohs(udph->dest));
 		if (find_node(&ports_to_drop, port) == 0){
-			return NF_DROP;
+			payload_length = ntohs(udph->len) - sizeof(udph) <= 0; /*filter udp scans that sends an empty packet by checking if the payload is empty*/
+			if(payload_length <= 0){
+				return NF_DROP;
+			}
 		}
 	}
 
@@ -51,7 +52,9 @@ static unsigned int hack_packet(void *priv, struct sk_buff *skb, const struct nf
 		tcph = tcp_hdr(skb);
 		snprintf(port, 6, "%hu", ntohs(tcph->dest));
 		if (find_node(&ports_to_drop, port) == 0){
-			return NF_DROP;
+			if(skb->data_len <= 0){ /*filter tcp scans that sends an empty packet by checking if the payload is empty*/
+				return NF_DROP;
+			}
 		}
 	}
 	
@@ -157,7 +160,6 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 	struct tcphdr *tcph;
 	char dest_port[6];
 	char source_port[6];
-
 
 	if (!skb)
 		return orig_tpacket_rcv(skb, dev, pt, orig_dev);
