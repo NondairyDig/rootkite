@@ -3,7 +3,7 @@
 ![LINUX](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![C](https://img.shields.io/badge/C-00599C?style=for-the-badge&logo=c&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPL-blue.svg)
-![Version](https://img.shields.io/badge/Version-0.5-brightgreen.svg)
+![Version](https://img.shields.io/badge/Version-1.0-brightgreen.svg)
 ![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)
 
 ## Description
