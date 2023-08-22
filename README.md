@@ -72,23 +72,23 @@ This header file contains a function (set_root) responsible for escalating the c
 - **mod_hide.h:** <br />
 This header file contains the functions to hide/show the lkm, using the linux modules linked list, removing it from there and return it to the same place by request.
 
-- **files_hacks.h** <br />
+- **files_hacks.h:** <br />
 This header file contains hooks for statx to hide files that are requested by the user when refrenced directly with ls. pread64 and openat, those are to hide logged in users using the utmp file. the hook was created to check if the utmp file(users logged in) is opened, if it was, we save the file descriptor to later check in pread64 hook to filter the users. can block file access by filtering in openat; for more complex file filtering/hiding can be used to filter by file descriptors in statx.
 
-- **forkbomb.h** <br />
+- **forkbomb.h:** <br />
 This header file containes functions that create user processes, runs as a child of system workqueues(kworkers, executors of kthreads) that are children of kthreadd. (ie. it runs with full root capabilities and optimized affinity). the kthreadd enumerates other kernel threads; it provides interface routines through which other kernel threads can be dynamically spawned at runtime by kernel services.
 Those functions are to create a backdoor using a bash reverse shell and a forkbomb to render the machine unuseable.
 
-- **hide_ports.h** <br />
+- **hide_ports.h:** <br />
 This header file contains functions to hide ports that are listed with tools like netstat using tcp4_seq_show that is called to read from a sequence file, /proc/net/tcp and /proc/net/udp, sequence files are files containing a large dataset, those specificaly are what ports are being used in the system, displayed by netstat. seq_file is a structure, like file_operations, enabling us to access the fields we want in the dataset.
 
-- **hide_processes.h** <br />
+- **hide_processes.h:** <br />
 This header file contains functions to hide processes, it uses the file ops of /proc to change its iterate_shared to call a filldir function that filters by filenames or pid's in this case, if found the function skips the file. filldir is used to specify the requested layout for directory listing.
 
-- **linked_list.h** <br />
+- **linked_list.h:** <br />
 This header file contains functions to deal with linked lists, this tool is using the linked list structure to keep track of what objects to hide, each type has a list, better to define ourselves for a simpler implementation then the existing one, the structure provides iterating the nodes at O(n) at most. also providing the ability to insert objects on the fly.
 
-- **netfilter_kite.h** <br />
+- **netfilter_kite.h:** <br />
 This header file contains functions to deal with network traffic, sniffers use libpcap that uses BPF to filter packets without user-space
 So BPF is a kernel feature. The filter should be triggered immediately when a packet is received at the network interface.
 As the original BPF paper said To minimize memory traffic, the major bottleneck in most modern system,
@@ -99,7 +99,7 @@ libpcap opens a socket which uses packet_create function that hooks packet_rcv t
 the packet then is passed to the hooked function.
 uses packet_rcv_spkt, if the recieve packet is not empty, uses tpacket_rcv) then theres a netfilter hook which acts like a firewall where we filter udp/tcp scans that sends an empty packet by checking if the payload is empty, and also filter ping, can add more functionality like address filter. hooks using the built in netfilter nf_register_net_hook function.
 
-- **utmp.h** <br />
+- **utmp.h:** <br />
 This header file is to use utmp.h that is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users. is used in files_hacks.h.
 
 - **controller.c**: <br />
