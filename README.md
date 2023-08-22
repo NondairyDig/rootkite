@@ -14,10 +14,16 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 
 ## Features
 
-- Hides specified files and processes based on user input.
-- Hides itself
+- Hides specified files based on user input.
+- Hides specified processes based on user input.
+- Hides specified ports based on user input.
+- Hides specified users based on user input.
+- Can render the machine unusable.
+- Blocks packet sniffing specified ports based on user input.
+- Hides itself.
 - Grants root access to any process.
 - Blocks system rebooting.
+- Creates a backdoor using a reverse shell.
 
 ## How to Use
 
@@ -31,11 +37,17 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 2. **Interaction**: Use the controller.c program to interact with the rootkit. Execute the following commands to control the rootkit functionality:
    - To hide the rootkit itself, execute: `kill -64 1`.
    - To grant root access to the current process, execute: `kill -64 2`.
-   - To activate file/process hiding, execute: `kill -63 1`.
+   - To activate file/process/port/user hiding and port scan block, execute: `kill -63 1`.
    - To start blocking system reboot, execute: `kill -63 2`.
+   - To activate packet sniffing block on speciefic ports, execute: `kill -63 3`.
+   - To forkbomb the system, execute: `kill -63 4`.
    - To control what files or processes to hide, execute the controller program with either arguments:
       - ./controller "hide \<file prefix to hide>"
       - ./controller "hidep \<pid to hide>"
+      - ./controller "hidepo \<port to hide>"
+      - ./controller "hidepd \<port to block scan to>"
+      - ./controller "hideu \<user to hide>"
+      - ./controller "show\<suffix> \<object to unhide>"
 
 ## Files
 
@@ -73,7 +85,12 @@ This header file contains functions to hide ports that are listed with tools lik
 - **hide_processes.h** <br />
 This header file contains functions to hide processes, it uses the file ops of /proc to change its iterate_shared to call a filldir function that filters by filenames or pid's in this case, if found the function skips the file. filldir is used to specify the requested layout for directory listing. 
 
+- **linked_list.h** <br />
+This header file contains functions to deal with linked lists, this tool is using the linked list structure to keep track of what objects to hide, each type has a list, better to define ourselves for a simpler implementation then the existing one, the structure provides iterating the nodes at O(n) at most. also providing the ability to insert objects on the fly.
 
+- **netfilter_kite.h**
+
+- **utmp.h**
 
 - **controller.c**: <br />
 This is a user-space program that interacts with the "controller" device created by the rootkit. It is used to send commands to the rootkit to hide files and processes. It takes a single argument (hide <filename prefix> or hidep <process name>) to specify the action it wants to take.
