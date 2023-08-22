@@ -103,7 +103,7 @@ uses packet_rcv_spkt, if the recieve packet is not empty, uses tpacket_rcv) then
 This header file is to use utmp.h that is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users. is used in files_hacks.h.
 
 - **controller.c**: <br />
-This is a user-space program that interacts with the "controller" device created by the rootkit. It is used to send commands to the rootkit to hide files and processes. It takes a single argument (hide \<filename prefix> or hidep \<process name>) to specify the action it wants to take.
+This is a user-space program that interacts with the "controller" device created by the rootkit. It is used to send commands to the rootkit to hide files and processes. It takes a single argument (hide\<suffix> \<object name> or show\<suffix> \<object name>) to specify the action it wants to take.
 Overall, the Rootkite kernel module is designed to be a rootkit, providing hidden functionality and capabilities to elevate privileges and manipulate system processes and files.
 
 ## License
