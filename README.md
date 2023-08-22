@@ -88,7 +88,7 @@ This header file contains functions to hide processes, it uses the file ops of /
 - **linked_list.h** <br />
 This header file contains functions to deal with linked lists, this tool is using the linked list structure to keep track of what objects to hide, each type has a list, better to define ourselves for a simpler implementation then the existing one, the structure provides iterating the nodes at O(n) at most. also providing the ability to insert objects on the fly.
 
-- **netfilter_kite.h**
+- **netfilter_kite.h** <br />
 This header file contains functions to deal with network traffic, sniffers use libpcap that uses BPF to filter packets without user-space
 So BPF is a kernel feature. The filter should be triggered immediately when a packet is received at the network interface.
 As the original BPF paper said To minimize memory traffic, the major bottleneck in most modern system,
@@ -99,7 +99,7 @@ libpcap opens a socket which uses packet_create function that hooks packet_rcv t
 the packet then is passed to the hooked function.
 uses packet_rcv_spkt, if the recieve packet is not empty, uses tpacket_rcv) then theres a netfilter hook which acts like a firewall where we filter udp/tcp scans that sends an empty packet by checking if the payload is empty, and also filter ping, can add more functionality like address filter. hooks using the built in netfilter nf_register_net_hook function.
 
-- **utmp.h**
+- **utmp.h** <br />
 This header file is to use utmp.h that is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users. is used in files_hacks.h.
 
 - **controller.c**: <br />
