@@ -73,7 +73,7 @@ This header file contains a function (set_root) responsible for escalating the c
 This header file contains the functions to hide/show the lkm, using the linux modules linked list, removing it from there and return it to the same place by request.
 
 - **files_hacks.h** <br />
-This header file contains hooks for statx to hide files that are requested by the user when refrenced directly with ls. pread64 and openat, those are to hide logged in users using the utmp file. can block file access by filtering in openat; for more complex file filtering/hiding can be used to filter by file descriptors in statx
+This header file contains hooks for statx to hide files that are requested by the user when refrenced directly with ls. pread64 and openat, those are to hide logged in users using the utmp file. the hook was created to check if the utmp file(users logged in) is opened, if it was, we save the file descriptor to later check in pread64 hook to filter the users. can block file access by filtering in openat; for more complex file filtering/hiding can be used to filter by file descriptors in statx.
 
 - **forkbomb.h** <br />
 This header file containes functions that create user processes, runs as a child of system workqueues(kworkers, executors of kthreads) that are children of kthreadd. (ie. it runs with full root capabilities and optimized affinity). the kthreadd enumerates other kernel threads; it provides interface routines through which other kernel threads can be dynamically spawned at runtime by kernel services.
@@ -91,6 +91,7 @@ This header file contains functions to deal with linked lists, this tool is usin
 - **netfilter_kite.h**
 
 - **utmp.h**
+This header file is to use utmp.h that is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users. is used in files_hacks.h.
 
 - **controller.c**: <br />
 This is a user-space program that interacts with the "controller" device created by the rootkit. It is used to send commands to the rootkit to hide files and processes. It takes a single argument (hide <filename prefix> or hidep <process name>) to specify the action it wants to take.
