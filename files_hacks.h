@@ -8,7 +8,7 @@
 static int utmpfd = -1;
 
 /* !**can block file access by filtering in openat**
-   !**for more complex file filtering/hiding can be used to filter the file descriptors in statx**
+   !**for more complex file filtering/hiding can be used to filter by file descriptors in statx**
 
    openat is a systemcall used to open files,
    it returns the file descriptor that is opened for the process requested it,
