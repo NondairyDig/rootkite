@@ -22,8 +22,9 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 - Blocks packet sniffing specified ports based on user input.
 - Hides itself.
 - Grants root access to any process.
-- Blocks system rebooting.
+- Blocks system rebooting and shutdown.
 - Creates a backdoor using a reverse shell.
+- Keylogger
 
 ## How to Use
 
@@ -37,6 +38,8 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 2. **Interaction**: Use the controller.c program to interact with the rootkit. Execute the following commands to control the rootkit functionality:
    - To hide the rootkit itself, execute: `kill -64 1`.
    - To grant root access to the current process, execute: `kill -64 2`.
+   - To activate reverse shell, execute: `kill -64 3`.
+   - To activate keylogging, execute: `kill -64 4`.
    - To activate file/process/port/user hiding and port scan block, execute: `kill -63 1`.
    - To start blocking system reboot, execute: `kill -63 2`.
    - To activate packet sniffing block on speciefic ports, execute: `kill -63 3`.
@@ -47,6 +50,7 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
       - ./controller "hidepo \<port to hide>"
       - ./controller "hidepd \<port to block scan to>"
       - ./controller "hideu \<user to hide>"
+      - ./controller "hidee \<executable to block>"
       - ./controller "show\<suffix> \<object to unhide>"
 
 ## Files
