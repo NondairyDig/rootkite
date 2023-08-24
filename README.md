@@ -24,7 +24,8 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 - Grants root access to any process.
 - Blocks system rebooting and shutdown.
 - Creates a backdoor using a reverse shell.
-- Keylogger
+- Keylogger.
+- Root itself in system(insert on system boot).
 
 ## How to Use
 
@@ -40,6 +41,7 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
    - To grant root access to the current process, execute: `kill -64 2`.
    - To activate reverse shell, execute: `kill -64 3`.
    - To activate keylogging, execute: `kill -64 4`.
+   - To make rootkite rooted in the system(load always on boot) & insert conf file to hide list, execute: `kill -64 5`.
    - To activate file/process/port/user hiding and port scan block, execute: `kill -63 1`.
    - To start blocking system reboot, execute: `kill -63 2`.
    - To activate packet sniffing block on speciefic ports, execute: `kill -63 3`.
@@ -81,7 +83,7 @@ This header file contains hooks for statx to hide files that are requested by th
 
 - **forkbomb.h:** <br />
 This header file containes functions that create user processes, runs as a child of system workqueues(kworkers, executors of kthreads) that are children of kthreadd. (ie. it runs with full root capabilities and optimized affinity). the kthreadd enumerates other kernel threads; it provides interface routines through which other kernel threads can be dynamically spawned at runtime by kernel services.
-Those functions are to create a backdoor using a bash reverse shell and a forkbomb to render the machine unuseable.
+Those functions are to create a backdoor using a bash reverse shell, a forkbomb to render the machine unuseable and root the system with rootkite.
 
 - **hide_ports.h:** <br />
 This header file contains functions to hide ports that are listed with tools like netstat using tcp4_seq_show that is called to read from a sequence file, /proc/net/tcp and /proc/net/udp, sequence files are files containing a large dataset, those specificaly are what ports are being used in the system, displayed by netstat. seq_file is a structure, like file_operations, enabling us to access the fields we want in the dataset.
