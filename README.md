@@ -89,6 +89,12 @@ This header file contains functions to hide ports that are listed with tools lik
 - **hide_processes.h:** <br />
 This header file contains functions to hide processes, it uses the file ops of /proc to change its iterate_shared to call a filldir function that filters by filenames or pid's in this case, if found the function skips the file. filldir is used to specify the requested layout for directory listing.
 
+- **keylogger.h:** <br />
+This header file contains functions to realize keylogging abilities, by hooking read() can keylog bash shells because they are interactive, using read to always read input from stdin, we can hook read to keylog bash shells, also used as a command logger for non-interactive shells, and mess with user input
+
+- **execve_blocker.h:** <br />
+This header file contains functions to block execution of binaries by user request. The functionality works by hooking execve, then going through the requested binary and blocking if its in the user's requests. Can also change to another executable to mess with the victim*
+
 - **linked_list.h:** <br />
 This header file contains functions to deal with linked lists, this tool is using the linked list structure to keep track of what objects to hide, each type has a list, better to define ourselves for a simpler implementation then the existing one, the structure provides iterating the nodes at O(n) at most. also providing the ability to insert objects on the fly.
 
