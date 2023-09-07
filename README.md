@@ -135,3 +135,8 @@ Use it responsibly and ethically, with respect for others' systems and privacy.
 ## Disclaimer
 
 This rootkit is provided for educational and research purposes only. It is not intended for malicious use. The authors are not responsible for any damage or misuse caused by this software. Use it responsibly and legally, with proper authorization.
+
+## Ideas
+
+- eBPF IoT unusual traffic (DDoS detection)
+- RootKit blocker
