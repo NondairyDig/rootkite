@@ -9,7 +9,7 @@
     #include "linked_list.h"
 
 
-#define DEVICE_SIZE 512 // size of possible input in bytes
+#define DEVICE_SIZE 1024 // size of possible input in bytes
 char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
 
 
