@@ -12,6 +12,7 @@
 
 #define BUFFER_SIZE 1024
 #define PORT 63888
+#define ADDRESS "192.168.11.128"
 
 void* client_thread(void* choice)
 {
@@ -22,7 +23,7 @@ void* client_thread(void* choice)
 
 	struct sockaddr_in server_address;
 	server_address.sin_family = AF_INET;
-	server_address.sin_addr.s_addr = INADDR_ANY;
+	inet_aton(ADDRESS, (struct in_addr *)&server_address.sin_addr.s_addr);
 	server_address.sin_port = htons(PORT);
 
 	int connection_status = connect(network_socket,
