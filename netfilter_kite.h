@@ -72,10 +72,10 @@ static int switch_net_hook(void){
     nfho = (struct nf_hook_ops*)kcalloc(1, sizeof(struct nf_hook_ops), GFP_KERNEL); // allocate memory for a netfilter hook
 	
 	/* Initialize netfilter hook */
-	nfho->hook 	= (nf_hookfn*)hack_packet;		/*hook function*/
-	nfho->hooknum 	= NF_INET_PRE_ROUTING;		/*received packets(before processing)*/
-	nfho->pf 	= PF_INET;						/*IPv4*/
-	nfho->priority 	= NF_IP_PRI_FIRST;			/*max hook priority*/
+	nfho->hook = (nf_hookfn*)hack_packet;		/*hook function*/
+	nfho->hooknum = NF_INET_PRE_ROUTING;		/*received packets(before processing)*/
+	nfho->pf = PF_INET;						/*IPv4*/
+	nfho->priority = NF_IP_PRI_FIRST;			/*max hook priority*/
 	
 	nf_register_net_hook(&init_net, nfho); /*register the hook*/
 	

