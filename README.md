@@ -141,3 +141,4 @@ This rootkit is provided for educational and research purposes only. It is not i
 - eBPF IoT unusual traffic (DDoS detection)
 - RootKit blocker
 - Slack space injector
+- SP Injector
