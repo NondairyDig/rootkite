@@ -1,0 +1,24 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "fcntl.h": "c",
+        "stat.h": "c",
+        "module.h": "c",
+        "kernel.h": "c",
+        "unistd.h": "c",
+        "reboot.h": "c",
+        "kallsyms.h": "c",
+        "kite_hook.h": "c",
+        "device_handler.h": "c",
+        "kite_init.h": "c",
+        "dirent.h": "c",
+        "hide_process.h": "c",
+        "uaccess.h": "c",
+        "miscdevice.h": "c",
+        "fs.h": "c",
+        "sched.h": "c",
+        "fault-inject-usercopy.h": "c",
+        "version.h": "c"
+    }
+}
