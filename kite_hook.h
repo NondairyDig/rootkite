@@ -271,16 +271,10 @@ static int is_hook_activated(struct ftrace_hook *hooks, size_t count, char *symb
 	for (i = 0; i < count; i++)
 	{
 		if(strcmp(hooks[i].name, symbol) == 0){
-			if(hooks[i].activated == 1){
-				return 0;
-			}
-
-			else{
-				return 1;
-			}
+			return hooks[i].activated;
 		}
 	}
-	return 1;
+	return 0;
 }
 
 

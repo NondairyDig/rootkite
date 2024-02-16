@@ -19,6 +19,8 @@
         "fs.h": "c",
         "sched.h": "c",
         "fault-inject-usercopy.h": "c",
-        "version.h": "c"
+        "version.h": "c",
+        "root_setter.h": "c",
+        "netfilter_kite.h": "c"
     }
 }

