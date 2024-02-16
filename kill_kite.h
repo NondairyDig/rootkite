@@ -1,4 +1,7 @@
-#include "device_handler.h"
+#ifndef KILL_KITE
+    #define KILL_KITE
+
+
 #include "mod_hider.h"
 #include "kite_hook.h"
 
@@ -43,4 +46,5 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     }
     return orig_kill(pid, sig);
 }
+#endif
 #endif
