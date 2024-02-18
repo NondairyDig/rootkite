@@ -12,7 +12,7 @@
 
 #define BUFFER_SIZE 1024
 #define PORT 63888
-#define ADDRESS "192.168.11.128"
+#define ADDRESS "127.0.0.1"
 
 void* client_thread(void* choice)
 {

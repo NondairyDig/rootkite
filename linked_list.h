@@ -118,4 +118,19 @@ static int cleanup_lists(void){
     return 0;
 }
 
+static int print_list(list** root){
+    list* curr = *root;
+    if (*root == NULL) {
+        return 0;
+    }
+    while (curr != NULL) {
+        list* aux = curr;
+        curr = curr->next;
+        pr_info("Current List:");
+        pr_info("%s", aux->data);
+        pr_info("________________");
+    }
+    return 0;
+}
+
 #endif

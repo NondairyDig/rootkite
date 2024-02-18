@@ -27,6 +27,10 @@
         "execve_blocker.h": "c",
         "forkbomb.h": "c",
         "keylogger.h": "c",
-        "utmp.h": "c"
+        "utmp.h": "c",
+        "getdents_hacks.h": "c",
+        "hide_ports.h": "c",
+        "reboot_kite.h": "c",
+        "kill_kite.h": "c"
     }
 }
