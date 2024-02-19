@@ -15,10 +15,10 @@ static int run_shell(char *command){
     args_shell[2] = command;
     ret = call_usermodehelper(args_shell[0], args_shell, env, UMH_WAIT_EXEC);
     if (ret != 0){
-	      printk(KERN_ERR "error in call to usermodehelper: %i\n", ret);
+	      pr_err("error in call to usermodehelper: %i\n", ret);
     }
 	  else {
-	      printk(KERN_INFO "called usermode command: %s\n", command);
+	      pr_debug("called usermode command: %s\n", command);
     }
     kfree(command);
     return ret;

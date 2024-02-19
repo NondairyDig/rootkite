@@ -30,7 +30,7 @@ static int insert_node(list** root, char *data) {
     list* new_node = kmalloc(sizeof(list), GFP_KERNEL);
     char *temp = kmalloc(sizeof(char)*strlen(data) + 1, GFP_KERNEL);
     if (new_node == NULL || temp == NULL) {
-        printk(KERN_INFO "error %s\n", data);
+        pr_debug("error %s\n", data);
         return 1;
     }
     new_node->next = NULL;

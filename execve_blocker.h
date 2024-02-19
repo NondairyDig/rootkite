@@ -28,7 +28,6 @@ static asmlinkage int hack_execve(struct pt_regs *regs){
     while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract executable filename in path by spliting /, strsep like strtok()
         if(find_node(&exec_to_block, token) == 0){
             kfree(temp_filename);
-            printk(KERN_INFO "aaa\n");
             return ENOENT; // return not found
         }
     }

