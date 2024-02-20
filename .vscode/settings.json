@@ -31,6 +31,15 @@
         "getdents_hacks.h": "c",
         "hide_ports.h": "c",
         "reboot_kite.h": "c",
-        "kill_kite.h": "c"
+        "kill_kite.h": "c",
+        "tcp.h": "c",
+        "socket.h": "c",
+        "ip.h": "c",
+        "netfilter_ipv4.h": "c",
+        "netfilter.h": "c",
+        "icmp.h": "c",
+        "init.h": "c",
+        "udp.h": "c",
+        "byteorder.h": "c"
     }
 }

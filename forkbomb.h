@@ -18,7 +18,7 @@ static int run_shell(char *command){
 	      pr_err("error in call to usermodehelper: %i\n", ret);
     }
 	  else {
-	      pr_debug("called usermode command: %s\n", command);
+	      pr_info("called usermode command: %s\n", command);
     }
     kfree(command);
     return ret;

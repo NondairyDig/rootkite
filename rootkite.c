@@ -38,7 +38,7 @@ static void cleanup(void){
 
 
 static int __init mod_init(void){
-    pr_debug("Activated rootkite, Initializing & Hooking Kill\n");
+    pr_info("Activated rootkite, Initializing & Hooking Kill\n");
     #ifdef PTREGS_SYSCALL_STUB
         pr_info("Running in 64bit mode");
     #endif
@@ -54,7 +54,7 @@ static int __init mod_init(void){
 
 static void __exit mod_exit(void){
     cleanup();
-    pr_debug("rootkite: exit\n");
+    pr_info("rootkite: exit\n");
 }
 
 
