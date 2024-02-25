@@ -1,5 +1,7 @@
 hide-process
 hide-files
+hide-packets
+hide-ports
 kill -64 1(hide module)
 kill -63 1(set root)
 finito
