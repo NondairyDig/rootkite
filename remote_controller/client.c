@@ -19,26 +19,15 @@ void* client_thread(void* choice)
 	int network_socket;
 
 	network_socket = socket(AF_INET,
-							SOCK_STREAM, 0);
+							SOCK_DGRAM, 0);
 
 	struct sockaddr_in server_address;
 	server_address.sin_family = AF_INET;
 	inet_aton(ADDRESS, (struct in_addr *)&server_address.sin_addr.s_addr);
 	server_address.sin_port = htons(PORT);
 
-	int connection_status = connect(network_socket,
-									(struct sockaddr*)&server_address,
-									sizeof(server_address));
-
-	if (connection_status < 0) {
-		puts("Error\n");
-		return 0;
-	}
-
-	printf("Connection established\n");
-
-	send(network_socket, (char *)choice,
-		BUFFER_SIZE, 0);
+	sendto(network_socket, (char *)choice,
+		BUFFER_SIZE, 0, (struct sockaddr *) &server_address, sizeof(server_address));
 
 	close(network_socket);
 	pthread_exit(NULL);
