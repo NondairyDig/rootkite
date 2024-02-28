@@ -1,7 +1,15 @@
 hide-process
-hide-files
+hide-files-users
 hide-packets
 hide-ports
 kill -64 1(hide module)
 kill -63 1(set root)
+reverse-me
 finito
+hide server
+
+todo:
+block-files-reboot
+keylogging
+block-packets
+rooted
