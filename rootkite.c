@@ -18,9 +18,7 @@ MODULE_VERSION("1.0");
 
 /*
 !!! change to debugger
-NEW PLAN: make the rootkit communicate through the chardev. 
-The hiding of the chardev will be through the kill funciton that will be hooked at the start.
-the actions will be depoendent on a "secret" that is known only to the attacker that uses the kit.
+!!! consider workqueues and mutex usage
 */
 
 

