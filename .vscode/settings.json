@@ -40,6 +40,11 @@
         "icmp.h": "c",
         "init.h": "c",
         "udp.h": "c",
-        "byteorder.h": "c"
+        "byteorder.h": "c",
+        "keyboard.h": "c",
+        "notifier.h": "c",
+        "wait.h": "c",
+        "types.h": "c",
+        "srcu.h": "c"
     }
 }

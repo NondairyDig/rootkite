@@ -10,7 +10,8 @@ hide server
 block-files
 block-packets
 rooted
+keylogging
 
 todo:
-reboot - systemctl --force reboot | reboot
-keylogging
+reboot - *systemctl* --force reboot | reboot
+Documentation - keylogging, recent dev changes.
