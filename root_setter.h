@@ -2,7 +2,13 @@
     #define ROOT_SETTER_KITE
     
     #include <linux/cred.h>
-
+/*
+can also change credentials of a process by finding the task_struct with find_vpid()
+and changing the credentials with unlocking the rcu lock and read to then change task_struct->cred
+as commit_creds_to does'nt exists since 2022.
+**abort_creds() for freeing the allocated copy of credentials
+**look into kernel container escape
+*/
 static void set_root(void){
     struct cred *p_creds;
     p_creds = prepare_creds(); // get a COPY of the current task's credentials

