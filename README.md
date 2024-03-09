@@ -2,8 +2,7 @@
 
 ![LINUX](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![C](https://img.shields.io/badge/C-00599C?style=for-the-badge&logo=c&logoColor=white)
-![License](https://img.shields.io/badge/License-GPL-blue.svg)
-![Version](https://img.shields.io/badge/Version-1.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/Version-1.5-brightgreen.svg)
 ![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)
 
 ## Description
@@ -25,7 +24,7 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 - Blocks system rebooting and shutdown.
 - Creates a backdoor using a reverse shell.
 - Keylogger.
-- Root itself in system(insert on system boot).
+- Root itself in the system(insert on system boot).
 
 ## How to Use
 
@@ -33,50 +32,54 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
 
 1. **Compilation**:
    - Compile the rootkite.c rootkit file as a kernel module and load it using `insmod`.
-   - Compile the controller.c for interaction with the rootkit to change files/processes hiding.
-   <br />
-   <br />
-2. **Interaction**: Use the controller.c program to interact with the rootkit. Execute the following commands to control the rootkit functionality:
+   - Compile the server.c and client for interaction with the rootkit to change files/processes hiding.
+
+2. **Interaction**: Use the client/server program to interact with the rootkit. Execute the following commands to control the rootkit functionality:
    - To hide the rootkit itself, execute: `kill -64 1`.
-   - To grant root access to the current process, execute: `kill -64 2`.
-   - To activate reverse shell, execute: `kill -64 3`.
-   - To activate keylogging, execute: `kill -64 4`.
-   - To make rootkite rooted in the system(load always on boot) & insert conf file to hide list, execute: `kill -64 5`.
-   - To activate file/process/port/user/kernel syms hiding and port scan block, execute: `kill -63 1`.
-   - To start blocking system reboot, execute: `kill -63 2`.
-   - To activate packet sniffing block on speciefic ports, execute: `kill -63 3`.
-   - To forkbomb the system, execute: `kill -63 4`.
-   - To control what files or processes to hide, execute the controller program with either arguments:
-      - ./controller "hide \<file prefix to hide>"
-      - ./controller "hidep \<pid to hide>"
-      - ./controller "hidepo \<port to hide>"
-      - ./controller "hidepd \<port to block scan to>"
-      - ./controller "hideu \<user to hide>"
-      - ./controller "hidee \<executable to block>"
-      - ./controller "show\<suffix> \<object to unhide>"
+   - To grant root permissions to the current process, execute: `kill -63 1`.
+   - To control what files or processes to hide, execute the client program with either argument and make sure the server program is running:
+      - `./client "hide \<file prefix to hide>"`
+      - `./client "hidep \<pid to hide>"`
+      - `./client "hidepo \<port to hide>"`
+      - `./client "hidepd \<port to block>"`
+      - `./client "hideu \<user to hide>"`
+      - `./client "hidee \<executable to block>"`
+      - `./client "show\<suffix> \<object to unhide>"`
+      - `./client "hide-files-users"` - start hiding files and users that are in each list accordingly
+      - `./client "block-reboot"` - block rebooting the system
+      - `./client "block-shutdown"` - block shutdown of the system
+      - `./client "block-files"` - block execve of files
+      - `./client "hide-ports"` - hide ports from the user(hide from netstat)
+      - `./client "reverse-me"` - start a reverse shell *need to change for specifying the ip & port
+      - `./client "hide-packets"` - hide incoming TCP||UDP packets to a specific port, useful for hiding the C2 server(UDP Based).
+      - `./client "hide-process"` - hide processes that are on the list of processes to hide
+      - `./client "rooted"` - root the LKM in the system to load on every boot
+      - `./client "block-packets"` - block packets to specific ports
+      - `./client "finito"` - forkbomb the system
+      - `./client "keylogging"` - start the keylogger
 
 ## Files
 
 - **rootkite.c:**  <br />
-This is the main file of the Rootkite kernel module. It includes various headers required for kernel module development. The module initializes, installs hooks, and registers a misc device called "controller" to communicate with user-space and control the rootkit's functionality. The Activation of the functionallities is done by hooking the "kill" system call and calling specific signals with pid s(as specfiied above).
+This is the main file of the Rootkite kernel module. It includes various headers required for kernel module development. The module initializes, installs hooks, and registers a misc device called "controller" to communicate with user-space and control the rootkit's functionality. The Activation of the functionalities is done by hooking the "kill" system call and calling specific signals with pid s(as specified above).
 
 - **kite_init.h:** <br />
 This header file is used to determine whether the system is 64-bit and the kernel version. It defines PTREGS_SYSCALL_STUB when the system is 64-bit and the kernel uses ptregs_t type for system calls.
 
 - **kite_hook.h:** <br />
-This header file is responsible for hooking the original kernel functions using ftrace. It provides functions to install and remove hooks, resolve hook addresses, and ftrace thunks for hooking the functions. The hooks are kept in an array in the main file, and declared there. Because of unavaillability of kallsysm_lookup_name functtion, it is probed using kprobe, and then used to get a symbol's(syscall or other function) address.
+This header file is responsible for hooking the original kernel functions using ftrace. It provides functions to install and remove hooks, resolve hook addresses, and ftrace thunks for hooking the functions. The hooks are kept in an array in the main file and declared there. Because of the unavailability of kallsysm_lookup_name function, it is probed using kprobe, and then used to get a symbol's(syscall or other function) address.
 
 - **getdents_hacks.h:** <br />
 This header file contains the functions required for hiding files and directories. It contains the function to hook to the getdents and getdents64 system calls, which are used to list directory entries. The functions in this file manipulate the directory entries to hide files and processes whose names match specific criteria.
 
 - **device_handler.h:** <br />
-This header file defines the read and write functions for the "controller" misc device. The "controller" device is used to communicate with the rootkit from user-space and control its behavior. The write function is used to send commands to hide files, processes, etc., and the read function retrieves the last command written to the device.
+This header file defines the "read" and "write" functions for the "controller" misc device & the HOOK array that is used to track hooks on runtime. The "controller" device is used to communicate with the rootkit from user space and control its behavior. The write function is used when calling write fop with write syscall to send commands to hide files, processes, etc., and the read function retrieves the last command written to the device.
 
 - **root_setter.h:** <br />
 This header file contains a function (set_root) responsible for escalating the calling process's privileges to root (superuser). It uses prepare_creds to copy the current credentials of the calling process and commit_creds functions to set the user and group IDs(real, effective, file system) to 0, effectively elevating the process to root.
 
 - **mod_hide.h:** <br />
-This header file contains the functions to hide/show the lkm, using the linux modules linked list, removing it from there and return it to the same place by request.
+This header file contains the functions to hide/show the LKM, using the Linux modules linked list, removing it from there and returning it to the same place by request.
 
 - **files_hacks.h:** <br />
 This header file contains hooks for statx to hide files that are requested by the user when refrenced directly with ls. pread64 and openat, those are to hide logged in users using the utmp file. the hook was created to check if the utmp file(users logged in) is opened, if it was, we save the file descriptor to later check in pread64 hook to filter the users. if /proc/kallsyms is opened, updates and redirects to the fake file with removed refrences to rootkite ksyms. can block file access by filtering in openat; for more complex file filtering/hiding can be used to filter by file descriptors in statx.
@@ -141,4 +144,4 @@ This rootkit is provided for educational and research purposes only. It is not i
 - eBPF IoT unusual traffic (DDoS detection)
 - RootKit blocker
 - Slack space injector
-- SP Injector
+- forkmbomb in kernel mode

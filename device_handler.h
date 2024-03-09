@@ -23,6 +23,8 @@
 
 #define DEVICE_SIZE 1024 // size of possible input in bytes
 char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
+// TODO: create some auth mechanism for accessing the  device. like having a passphtase in a certain file or just accessing with a certain user.
+
 
 #ifdef PTREGS_SYSCALL_STUB
 static struct ftrace_hook ACTIVE_HOOKS[] = {
@@ -231,7 +233,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     if(memcmp("block-files", tmpdata, strlen("block-files")) == 0){
         if(strlen(tmpdata) == strlen("block-files")){
             strcpy(last_data, tmpdata);
-            pr_info("Blocking Files & Reboot: %s\n", last_data);
+            pr_info("Blocking Files: %s\n", last_data);
             print_list(&exec_to_block);
 
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
