@@ -84,7 +84,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         return -1;
     }
 
-    // can switch all the if's with data structure :| , (command-function)
+    // can switch all conditions with data structures :| , (command-function)
     if(memcmp("hide ", tmpdata, strlen("hide ")) == 0){
         if(strlen(tmpdata) > strlen("hide ") + 3){
             strcpy(last_data, tmpdata + strlen("hide "));
@@ -393,7 +393,7 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
     return 0;
 }
 
-struct file_operations fops = { // file operations on device file, what functions to call when reading/writing
+struct file_operations fops = { // file operations on device file, what functions to call when reading/writing; can add mmap operation for kernel memory dump.
     read: reader,
     write: writer
 };
