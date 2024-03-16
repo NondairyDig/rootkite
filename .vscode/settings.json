@@ -45,6 +45,7 @@
         "notifier.h": "c",
         "wait.h": "c",
         "types.h": "c",
-        "srcu.h": "c"
+        "srcu.h": "c",
+        "unistd_32.h": "c"
     }
 }

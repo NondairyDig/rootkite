@@ -17,6 +17,8 @@ Kprobes tries to reduce probe-hit overhead by using a jump instruction instead o
 When a probe is registered, before attempting this optimization, Kprobes inserts an ordinary, breakpoint-based kprobe at the specified address.
 So, even if it's not possible to optimize this particular probepoint, there'll be a probe there
 Hooking is also achievable with changing the cr0 register to disable memory protection make the memory writable
+
+can keep the hooks instead of having them in an array to have O(1) instead of O(n)
 */
 
 const int ACTIVE_HOOKS_SIZE = 16; /*Available number of hooks to store*/
@@ -232,6 +234,7 @@ void fh_remove_hook(struct ftrace_hook *hook)
 
 /* To hook/unhook a specifiec function we iterate over the hooks array
  * and then call the fh_install_hook/fh_remove_hook on the function
+ * can keep pass the hook itself to have O(1) instead of O(n)
  */
 
 static int switch_hook(struct ftrace_hook *hooks, size_t count, char *symbol){

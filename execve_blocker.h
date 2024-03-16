@@ -22,13 +22,13 @@ static asmlinkage int hack_execve(struct pt_regs *regs){
     }
 
     if(find_node(&exec_to_block, temp_filename) == 0){
-        return ENOENT;
+        return EIO;
     }
 
-    while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract executable filename in path by spliting /, strsep like strtok()
+    while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract executable filename in path by spliting /, strsep is like strtok()
         if(find_node(&exec_to_block, token) == 0){
             kfree(temp_filename);
-            return ENOENT; // return not found
+            return EIO; // return I/O Error
         }
     }
     return orig_execve(regs);
@@ -47,13 +47,13 @@ static asmlinkage int hack_execve(const char *pathname, char *const argv[], char
     }
 
     if(find_node(&exec_to_block, temp_filename) == 0){
-        return ENOENT;
+        return EIO;
     }
 
-    while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract executable filename in path by spliting /, strsep like strtok()
+    while((token = strsep(&temp_filename, "/"))) { // loop through the string to extract executable filename in path by spliting /, strsep is like strtok()
         if(find_node(&exec_to_block, token) == 0){
             kfree(temp_filename);
-            return ENOENT; // return not found
+            return EIO; // return I/O Error
         }
     }
     return orig_execve(pathname, argv, envp);
