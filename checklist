@@ -15,7 +15,6 @@ keylogging
 
 TODO:
 reboot - *systemctl* --force reboot | reboot
-KITE_DEBUG
 Documentation - keylogging, recent dev changes.
 
 
@@ -24,6 +23,9 @@ Finished docs:
 
 
 Can Add/Improve:
+  General:
+    consider workqueues and mutex usage
+
   device_handler:
     create some auth mechanism for accessing the  device. like having a passphtase in a certain file or just accessing with a certain user.
     can switch all conditions with data structure

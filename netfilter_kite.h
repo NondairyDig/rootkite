@@ -109,9 +109,13 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
+#ifdef KITE_DEBUG
 		pr_info("a %s\n", dest_port);
+#endif
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+#ifdef KITE_DEBUG
 			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
+#endif
 			return NF_DROP;
 		}
 	}
@@ -119,9 +123,13 @@ static int hack_packet_rcv(struct sk_buff *skb, struct net_device *dev, struct p
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
+#ifdef KITE_DEBUG
 		pr_info("a %s\n", dest_port);
+#endif
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+#ifdef KITE_DEBUG			
 			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
+#endif
 			return NF_DROP;
 		}
 	}
@@ -143,9 +151,13 @@ static int hack_packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev, str
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
+#ifdef KITE_DEBUG
 		pr_info("a %s\n", dest_port);
+#endif
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+#ifdef KITE_DEBUG
 			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
+#endif
 			return NF_DROP; 
 		}
 	}
@@ -153,9 +165,13 @@ static int hack_packet_rcv_spkt(struct sk_buff *skb, struct net_device *dev, str
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
+#ifdef KITE_DEBUG
 		pr_info("a %s\n", dest_port);
+#endif
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+#ifdef KITE_DEBUG
 			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
+#endif
 			return NF_DROP;
 		}
 	}
@@ -176,9 +192,13 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 		udph = udp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(udph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(udph->source));
+#ifdef KITE_DEBUG
 		pr_info("a %s\n", dest_port);
+#endif
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+#ifdef KITE_DEBUG
 			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
+#endif
 			return NF_DROP;
 		}
 	}
@@ -186,9 +206,13 @@ static int hack_tpacket_rcv(struct sk_buff *skb, struct net_device *dev, struct 
 		tcph = tcp_hdr(skb);
 		snprintf(dest_port, 6, "%hu", ntohs(tcph->dest));
 		snprintf(source_port, 6, "%hu", ntohs(tcph->source));
+#ifdef KITE_DEBUG
 		pr_info("a %s\n", dest_port);
+#endif
 		if (find_node(&ports_to_hide, source_port) == 0 || find_node(&ports_to_hide, dest_port) == 0){
+#ifdef KITE_DEBUG
 			find_node(&ports_to_hide, source_port) == 0 ? pr_info("packet from %s was blocked\n", source_port) : pr_info("packet to %s was blocked\n", dest_port);
+#endif
 			return NF_DROP;
 		}
 	}

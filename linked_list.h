@@ -30,7 +30,10 @@ static int insert_node(list** root, char *data) {
     list* new_node = kmalloc(sizeof(list), GFP_KERNEL);
     char *temp = kmalloc(sizeof(char)*strlen(data) + 1, GFP_KERNEL);
     if (new_node == NULL || temp == NULL) {
+#ifdef KITE_DEBUG
         pr_info("error %s\n", data);
+#endif
+
         return 1;
     }
     new_node->next = NULL;
@@ -65,7 +68,9 @@ static int remove_node_by_name(list **root, char *data){
             kfree(curr->next->data);
             kfree(curr->next);
             curr->next = curr->next->next;
+#ifdef KITE_DEBUG
             pr_info("removed %s", data);
+#endif
             return 0;
         }
         curr = curr->next;
@@ -128,7 +133,7 @@ static int print_list(list** root){
     while (curr != NULL) {
         list* aux = curr;
         curr = curr->next;
-        pr_info("%s\n", aux->data);
+		pr_info("%s\n", aux->data);
     }
     pr_info("________________\n");
     return 0;
