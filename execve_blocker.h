@@ -22,6 +22,7 @@ static asmlinkage int hack_execve(struct pt_regs *regs){
     }
 
     if(find_node(&exec_to_block, temp_filename) == 0){
+        kfree(temp_filename);
         return EIO;
     }
 
@@ -31,6 +32,7 @@ static asmlinkage int hack_execve(struct pt_regs *regs){
             return EIO; // return I/O Error
         }
     }
+    kfree(temp_filename);
     return orig_execve(regs);
 }
 #else
@@ -47,6 +49,7 @@ static asmlinkage int hack_execve(const char *pathname, char *const argv[], char
     }
 
     if(find_node(&exec_to_block, temp_filename) == 0){
+        kfree(temp_filename);
         return EIO;
     }
 
@@ -56,6 +59,7 @@ static asmlinkage int hack_execve(const char *pathname, char *const argv[], char
             return EIO; // return I/O Error
         }
     }
+    kfree(temp_filename);
     return orig_execve(pathname, argv, envp);
 }
 #endif

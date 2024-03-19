@@ -12,7 +12,7 @@ static int utmpfd = -1;
 
    openat is a systemcall used to open files,
    it returns the file descriptor that is opened for the process requested it,
-   it allows relative access to files relative to the directory it was called from,
+   it allows access to files relative to the directory it was called from,
    it uses dirfd which is the file descriptor of the current dir, if the path is aboslute,
    it ignores the dirfd. can create the file if not exists.
    the hook was created to check if the utmp file(users logged in) is opened,

