@@ -1,18 +1,3 @@
-hide-process
-hide-files-users
-hide-packets
-hide-ports
-kill -64 1(hide module)
-kill -63 1(set root)
-reverse-me
-finito
-hide server
-block-files
-block-packets
-rooted
-keylogging
-
-
 TODO:
 reboot - *systemctl* --force reboot | reboot
 Documentation - keylogging, recent dev changes.
