@@ -1,5 +1,5 @@
-#ifndef FORKBOMB_KITE
-    #define FORKBOMB_KITE
+#ifndef COMMAND_KITE
+    #define COMMAND_KITE
     #include <linux/slab.h>
     #include <linux/umh.h>
 

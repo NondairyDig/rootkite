@@ -22,7 +22,7 @@ Finished docs:
   device_handler.h
   execve_blocker.h
   files_hacks.h
-  forkbomb.h
+  command_kite.h
 
 Can Add/Improve:
   General:
@@ -36,6 +36,13 @@ Can Add/Improve:
   execve_blocker:
     change to another executable to mess with the victim
   
+  files_hacks:
+    can block file access by filtering in openat
+    for more complex file filtering/hiding/masking can be used to filter by file descriptors in statx
+
+  command_kite:
+    can also spawn multiple processes for multiple workers for added complexity.
+
   kite_hook:
     can keep the hooks instead of having them in an array to have O(1) instead of O(n)
   

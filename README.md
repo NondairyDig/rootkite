@@ -55,7 +55,7 @@ Rootkite is a rootkit written for the Linux kernel as a kernel module. It is des
       - `./client "hide-process"` - hide processes that are on the list of processes to hide
       - `./client "rooted"` - root the LKM in the system to load on every boot
       - `./client "block-packets"` - block packets to specific ports
-      - `./client "finito"` - forkbomb the system
+      - `./client "finito"` - command_kite the system
       - `./client "keylogging"` - start the keylogger
 
 ## Files
@@ -84,9 +84,9 @@ This header file contains the functions to hide/show the LKM, using the Linux mo
 - **files_hacks.h:** <br />
 This header file contains hooks for statx to hide files that are requested by the user when refrenced directly with ls. pread64 and openat, those are to hide logged in users using the utmp file. the hook was created to check if the utmp file(users logged in) is opened, if it was, we save the file descriptor to later check in pread64 hook to filter the users. if /proc/kallsyms is opened, updates and redirects to the fake file with removed refrences to rootkite ksyms. can block file access by filtering in openat; for more complex file filtering/hiding can be used to filter by file descriptors in statx.
 
-- **forkbomb.h:** <br />
+- **command_kite.h:** <br />
 This header file containes functions that create user processes, runs as a child of system workqueues(kworkers, executors of kthreads) that are children of kthreadd. (ie. it runs with full root capabilities and optimized affinity). the kthreadd enumerates other kernel threads; it provides interface routines through which other kernel threads can be dynamically spawned at runtime by kernel services.
-Those functions are to create a backdoor using a bash reverse shell, a forkbomb to render the machine unuseable, root the system with rootkite and create a copy of /proc/kallsyms without rootkite's kernel symbols to later redirect to.
+Those functions are to create a backdoor using a bash reverse shell, a command_kite to render the machine unuseable, root the system with rootkite and create a copy of /proc/kallsyms without rootkite's kernel symbols to later redirect to.
 
 - **hide_ports.h:** <br />
 This header file contains functions to hide ports that are listed with tools like netstat using tcp4_seq_show that is called to read from a sequence file, /proc/net/tcp and /proc/net/udp, sequence files are files containing a large dataset, those specificaly are what ports are being used in the system, displayed by netstat. seq_file is a structure, like file_operations, enabling us to access the fields we want in the dataset.

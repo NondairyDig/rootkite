@@ -25,7 +25,7 @@
         "linked_list.h": "c",
         "files_hacks.h": "c",
         "execve_blocker.h": "c",
-        "forkbomb.h": "c",
+        "command_kite.h": "c",
         "keylogger.h": "c",
         "utmp.h": "c",
         "getdents_hacks.h": "c",

