@@ -2,6 +2,9 @@
     #define KITE_INIT
     #include <linux/kconfig.h>
     #include <linux/version.h> // get kernel versions
+
+
+// Initialize params for the module compilation
 #define MODNAME "rootkite"
 #define KITE_DEBUG // debug module
 #ifdef CONFIG_X86_64 /* check if system is 64bit*/

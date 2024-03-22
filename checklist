@@ -8,10 +8,17 @@ Finished docs:
   execve_blocker.h
   files_hacks.h
   command_kite.h
+  getdents_hacks.h
+  hide_ports.h
+  hide_process.h
+  keylogger.h
+  kite_init.h
+
 
 Can Add/Improve:
   General:
     consider workqueues and mutex usage
+    add ftrace hiding, filter out traces from tracefs
 
   device_handler:
     create some auth mechanism for accessing the  device. like having a passphtase in a certain file or just accessing with a certain user.
@@ -26,8 +33,18 @@ Can Add/Improve:
     for more complex file filtering/hiding/masking can be used to filter by file descriptors in statx
 
   command_kite:
+    maybe switch to sh shell, which almost always present in os
     can also spawn multiple processes for multiple workers for added complexity.
 
   kite_hook:
     can keep the hooks instead of having them in an array to have O(1) instead of O(n)
+  
+  keylogging:
+    can make user "miss" by counting and notifying NOTIFY_STOP every couple of times or just replacing with another keypress
+
+  kill_kite:
+    hide chardev
+  
+  kite_init:
+    differentiate versions on init
   

