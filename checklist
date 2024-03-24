@@ -14,6 +14,11 @@ Finished docs:
   keylogger.h
   kite_init.h
 
+  linked_list.h
+  logger.h
+  mod_hider.h
+  netfilter_kite.h
+  
 
 Can Add/Improve:
   General:
@@ -47,4 +52,11 @@ Can Add/Improve:
   
   kite_init:
     differentiate versions on init
+  
+  netfilter_kite:
+    CAN ADD SOURCE/DEST ADDRESS FILTER
+    Protocol Filter
+    ping filter
+    can bypass port scanning by sending back with icmp_send port unreachable
+    
   

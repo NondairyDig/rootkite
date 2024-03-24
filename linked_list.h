@@ -69,7 +69,7 @@ static int remove_node_by_name(list **root, char *data){
             kfree(curr->next);
             curr->next = curr->next->next;
 #ifdef KITE_DEBUG
-            pr_info("removed %s", data);
+            pr_info("removed %s\n", data);
 #endif
             return 0;
         }

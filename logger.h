@@ -1,3 +1,5 @@
+/*defines macros for using when printing information*/
+
 #define pr_fmt(fmt)	KBUILD_MODNAME "->%s:%d: " fmt, __func__, __LINE__
 
 #define pr_emerg(fmt, ...) \

