@@ -51,7 +51,7 @@ static int insert_node(list** root, char *data) {
     return 0;
 }
 
-/*search the list for a matching name, removing that node from the list and connecting its neighbours*/
+// search the list for a matching name, removing that node from the list and connecting its neighbours
 static int remove_node_by_name(list **root, char *data){
     list* curr = *root;
     if (*root == NULL) {
@@ -79,7 +79,7 @@ static int remove_node_by_name(list **root, char *data){
     return 1;
 }
 
-// iterate the list and return if node with the data provided exists.
+// iterate the list and return if node with the data provided exists. **fix return 0 instead of 1 when found:(
 static int find_node(list** root, char *data) {
     list* curr = *root;
     if (*root == NULL){
@@ -98,7 +98,7 @@ static int find_node(list** root, char *data) {
     return 1;
 }
 
-/*iteratiing the list, freeing the dynamicaly allocated memory of the nodes*/
+// iteratiing the list, freeing the dynamicaly allocated memory of the nodes
 static int cleanup_list(list** root){
     list* curr = *root;
     if (*root == NULL) {

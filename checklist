@@ -13,7 +13,7 @@ Finished docs:
   hide_process.h
   keylogger.h
   kite_init.h
-
+  
   linked_list.h
   logger.h
   mod_hider.h
@@ -21,6 +21,7 @@ Finished docs:
   reboot_kite.h
   root_setter.h
   utmp.h
+  rootkite.c
 
 
 Can Add/Improve:

