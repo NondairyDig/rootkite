@@ -18,7 +18,10 @@ Finished docs:
   logger.h
   mod_hider.h
   netfilter_kite.h
-  
+  reboot_kite.h
+  root_setter.h
+  utmp.h
+
 
 Can Add/Improve:
   General:
