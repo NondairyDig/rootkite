@@ -1,8 +1,3 @@
-TODO:
-reboot - *systemctl* --force reboot | reboot
-Documentation - keylogging, recent dev changes.
-
-
 Finished docs:
   device_handler.h
   execve_blocker.h
@@ -13,7 +8,7 @@ Finished docs:
   hide_process.h
   keylogger.h
   kite_init.h
-  
+  kite_hook.h
   linked_list.h
   logger.h
   mod_hider.h
@@ -62,5 +57,7 @@ Can Add/Improve:
     Protocol Filter
     ping filter
     can bypass port scanning by sending back with icmp_send port unreachable
-    
+  
+  reboot_kite:
+    reboot - *systemctl* --force reboot | reboot
   

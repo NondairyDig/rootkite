@@ -89,7 +89,7 @@ This header file containes functions that create user processes, runs as a child
 Those functions are to create a backdoor using a bash reverse shell, a command_kite to render the machine unuseable, root the system with rootkite and create a copy of /proc/kallsyms without rootkite's kernel symbols to later redirect to.
 
 - **hide_ports.h:** <br />
-This header file contains functions to hide ports that are listed with tools like netstat using tcp4_seq_show that is called to read from a sequence file, /proc/net/tcp and /proc/net/udp, sequence files are files containing a large dataset, those specificaly are what ports are being used in the system, displayed by netstat. seq_file is a structure, like file_operations, enabling us to access the fields we want in the dataset.
+This header file contains functions to hide ports that are listed with tools like netstat using tcp4_seq_show that is called to read from a sequence file, /proc/net/tcp and /proc/net/udp, sequence files are large datasets, those specificaly are what ports are being used in the system, displayed by netstat. seq_file is a structure, like file_operations, enabling us to access the fields we want in the dataset.
 
 - **hide_processes.h:** <br />
 This header file contains functions to hide processes, it uses the file ops of /proc to change its iterate_shared to call a filldir function that filters by filenames or pid's in this case, if found the function skips the file. filldir is used to specify the requested layout for directory listing.

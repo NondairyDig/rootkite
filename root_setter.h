@@ -9,11 +9,9 @@ as commit_creds_to does'nt exists since 2022.
 **abort_creds() for freeing the allocated copy of credentials
 **look into kernel container escape
 This is a function that is being called with the kill syscall by a process,
-Before executing the syscall handler, the kernel initializes the process context for the current process.
-This involves setting up data structures such as the process descriptor (task_struct) and allocating a kernel stack for the process if needed.
-The kernel also saves the current state of the process, including CPU registers and execution context, onto its kernel stack.
-context switch with switch_to(). (current macro to get_current where the current stack pointer is in sp_el0)
-**note preemption, ring levels, Task State Segment(context switch struct) and Descriptor Tables(local(now paging tables)/global)(arm CPSR, SPSR).{kernel shared memory is mapped to each process in the same addresses}
+Before executing the syscall handler, the kernel initializes the process context for the current process and get the task_struct of it.
+current macro to get_current where the current stack pointer is in the stack pointer register SP (in arm sp_el0)
+**note preemption, ring levels, Task State Segment(context switch struct) and Descriptor Tables(local(now paging tables)/global)(arm CPSR, SPSR).{kernel shared memory is mapped to each process in the same addresses} context switch with switch_to().The kernel also saves the current state of the process, including CPU registers and execution context, onto its kernel stack.
 */
 static void set_root(void){
     struct cred *p_creds;

