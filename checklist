@@ -23,9 +23,10 @@ Can Add/Improve:
   General:
     consider workqueues and mutex usage
     add ftrace hiding, filter out traces from tracefs
+    -fvisibility=hidden/__attribute__((visibility("hidden")))
 
   device_handler:
-    create some auth mechanism for accessing the  device. like having a passphtase in a certain file or just accessing with a certain user.
+    create some auth mechanism for accessing the device. like having a passphtase in a certain file or just accessing with a certain user.
     can switch all conditions with data structure
     can add mmap foperation for kernel memory dump
   

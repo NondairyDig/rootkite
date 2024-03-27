@@ -22,8 +22,8 @@
 
 
 #define DEVICE_SIZE 1024 // size of possible input in bytes
-char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
-// TODO: create some auth mechanism for accessing the  device. like having a passphtase in a certain file or just accessing with a certain user.
+static char last_data[DEVICE_SIZE] = "no data has been written yet"; // last written data from userspace
+// TODO: create some auth mechanism for accessing the  device. like having a passphtase in a certain file or just accessing with a certain user(with current).
 
 
 #ifdef PTREGS_SYSCALL_STUB
